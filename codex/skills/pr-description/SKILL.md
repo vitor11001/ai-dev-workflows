@@ -35,10 +35,8 @@ Quando esta skill for usada:
 1. Trabalhe no repositório atual.
 2. Identifique a branch atual e a branch base (`main` ou `master`).
 3. **Coleta de Contexto:** Execute o script localizado em `ai-dev-workflows/codex/skills/pr-description/scripts/pr_context.sh` para obter o diff e as informações das mudanças.
-4. Verifique se existe um template de PR no repositório (ex: `.github/pull_request_template.md`).
-5. Se existir template, use a estrutura dele como prioridade. Caso contrário, use o **Formato Padrão** desta skill.
-6. Gere uma descrição objetiva, fiel ao diff coletado pelo script.
-7. Não faça commit e não publique no GitHub sem pedido explícito.
+4. Gere uma descrição objetiva, fiel ao diff coletado pelo script.
+5. Não faça commit e não publique no GitHub sem pedido explícito.
 
 ## Formato padrão (na ausência de template)
 
