@@ -14,10 +14,6 @@ Workflows, agentes, skills e scripts auxiliares pessoais para usar com Codex e o
 - `codex/skills/commit-message`: skill para gerar mensagens de commit com base no diff.
 - `codex/skills/onboarding`: skill para mapear e resumir um projeto rapidamente.
 
-### Prompts
-
-- `prompts/pr-description.md`: prompt base para criação de descrição de PR.
-
 ### Guias
 
 - `TESTING.md`: padrão de engenharia para criação e refatoração de testes Python por humanos e LLMs.
@@ -27,6 +23,11 @@ Workflows, agentes, skills e scripts auxiliares pessoais para usar com Codex e o
 ```bash
 ./install.sh
 ```
+
+Durante a instalação:
+
+- as skills existentes em `~/.codex/skills` são copiadas para um backup em `~/.codex/skills-backup/<timestamp>/`, quando já houver versões anteriores;
+- scripts `.sh` dentro das skills instaladas recebem permissão de execução automaticamente.
 
 ## Uso
 
