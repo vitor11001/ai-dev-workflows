@@ -8,6 +8,7 @@ Workflows, agentes, skills e scripts auxiliares pessoais para usar com Codex e o
 
 - `codex/AGENTS.md`: instruções globais para uso do Codex neste repositório.
 - `codex/skills/pr-description`: skill para gerar descrições de Pull Request com base no diff da branch atual.
+  Ela também gera um título de PR e ignora arquivos de template de PR no contexto coletado.
 - `codex/skills/test-generator`: skill para gerar testes Python seguindo o `TESTING.md`.
 - `codex/skills/test-refactor`: skill para reorganizar e modernizar testes Python existentes.
 - `codex/skills/code-review`: skill para revisar diffs e identificar riscos técnicos.
@@ -41,5 +42,7 @@ As demais skills instaladas seguem a mesma estrutura e podem ser usadas diretame
 Quando você pedir uma descrição de PR, o fluxo esperado deste repositório é:
 
 1. Coletar o contexto da branch atual.
-2. Gerar uma descrição objetiva com base no diff.
-3. Escrever o resultado em `pr_body.md`, quando aplicável.
+2. Ignorar arquivos de template de PR durante a coleta de contexto.
+3. Gerar um título objetivo com base no diff.
+4. Gerar uma descrição objetiva com base no diff.
+5. Escrever o resultado em `pr_body.md`, com o título separado da descrição no mesmo arquivo.

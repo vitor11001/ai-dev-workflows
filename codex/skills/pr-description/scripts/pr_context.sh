@@ -10,6 +10,15 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 fi
 
 CURRENT_BRANCH="$(git branch --show-current)"
+DIFF_EXCLUDES=(
+  ":(exclude).github/PULL_REQUEST_TEMPLATE"
+  ":(exclude).github/PULL_REQUEST_TEMPLATE.md"
+  ":(exclude).github/PULL_REQUEST_TEMPLATE/*"
+  ":(exclude).github/pull_request_template.md"
+  ":(exclude).github/pull_request_template/*"
+  ":(exclude)PULL_REQUEST_TEMPLATE.md"
+  ":(exclude)pull_request_template.md"
+)
 
 # Detecta a base branch (priorizando origin)
 if git rev-parse --verify origin/master >/dev/null 2>&1; then
@@ -36,13 +45,13 @@ echo "## Branch base: $BASE_BRANCH ($BASE_HASH)"
 
 echo ""
 echo "## Arquivos alterados"
-git --no-pager diff --name-status "$BASE_HASH"..HEAD
+git --no-pager diff --name-status "$BASE_HASH"..HEAD -- . "${DIFF_EXCLUDES[@]}"
 
 echo ""
 echo "## Diff stat"
-git --no-pager diff --stat "$BASE_HASH"..HEAD
+git --no-pager diff --stat "$BASE_HASH"..HEAD -- . "${DIFF_EXCLUDES[@]}"
 
 echo ""
 echo "## Diff completo"
 # Usando o Hash aqui para que o rtk não se perca com referências remotas
-rtk git --no-pager diff "$BASE_HASH"..HEAD
+rtk git --no-pager diff "$BASE_HASH"..HEAD -- . "${DIFF_EXCLUDES[@]}"
