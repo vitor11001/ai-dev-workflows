@@ -17,10 +17,12 @@
 
 - Ao gerar, revisar, refatorar ou reorganizar testes Python, use `TESTING.md` como contexto obrigatório.
 - Siga o guia para `pytest + Django` e `pytest + FastAPI`.
-- Espelhe a estrutura do codigo em `tests/unit/`, `tests/integration/` e `tests/e2e/`.
+- Espelhe a estrutura do código em `tests/unit/`, `tests/integration/` e `tests/e2e/`.
 - Prefira factories, fixtures pequenas e testes orientados a comportamento.
 - Não mantenha ou introduza padrões legados com `unittest.TestCase`, salvo pedido explícito.
 
-## Skills
+## Escopo por Diretório
 
-- Quando eu pedir descrição de PR, use a skill `pr-description`, se disponível.
+- Este arquivo define regras globais para o repositório inteiro.
+- O diretório `codex/` possui instruções específicas em [codex/AGENTS.md](/home/vitor11001/Documentos/My_Repo/ai-dev-workflows/codex/AGENTS.md:1).
+- Ao trabalhar dentro de `codex/`, siga também o `AGENTS.md` específico daquele diretório.

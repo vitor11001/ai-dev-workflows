@@ -24,7 +24,7 @@ Uma ou mais sugestões de mensagem de commit, prontas para uso, sem efetuar o co
 ## Procedimento
 
 Quando esta skill for usada:
-1. Analise o diff staged ou, se não houver staging relevante, o diff atual solicitado pelo usuário.
+1. Colete o contexto com o script `scripts/commit_context.sh` da própria skill.
 2. Identifique o objetivo principal da mudança.
 3. Sintetize o comportamento alterado em uma mensagem curta e específica.
 4. Se a mudança misturar temas distintos, indique que o ideal seria separar commits ou ofereça mais de uma opção de mensagem.

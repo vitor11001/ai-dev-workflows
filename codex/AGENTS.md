@@ -1,11 +1,22 @@
-# Instruções globais para o Codex
+# Instruções específicas para `codex/`
 
-- Responda em português brasileiro.
-- Seja direto, técnico e prático.
-- Preserve os padrões do repositório atual.
-- Prefira mudanças pequenas e fáceis de revisar.
-- Não faça commit, push, merge ou publique nada sem pedido explícito.
-- Não execute comandos destrutivos sem confirmação.
-- Não exponha tokens, chaves, credenciais ou dados sensíveis.
-- Não afirme que algo foi testado se não foi executado.
-- Quando eu pedir descrição de PR, use a skill `pr-description`, se disponível.
+## Escopo
+
+- Este arquivo complementa o `AGENTS.md` da raiz para tudo que estiver dentro de `codex/`.
+- Use estas instruções junto com as regras globais do repositório.
+
+## Skills
+
+- Quando eu pedir explicitamente uma skill pelo nome, use essa skill se ela estiver disponível.
+- Quando o pedido corresponder claramente a uma skill existente no repositório, você pode usá-la.
+- Se houver ambiguidade, prefira não acionar skill desnecessariamente.
+- As skills disponíveis ficam em `codex/skills/`.
+
+## Skills disponíveis em `codex/skills`
+
+- `pr-description`: gera descrições de pull request com base no diff da branch atual.
+- `test-generator`: gera testes Python com `pytest` seguindo o `TESTING.md`.
+- `test-refactor`: refatora, consolida e reorganiza testes Python existentes.
+- `code-review`: revisa diffs, branches e arquivos alterados com foco em bugs, regressões e riscos.
+- `commit-message`: gera mensagens de commit com base nas alterações atuais.
+- `onboarding`: analisa e resume a estrutura, arquitetura e convenções do projeto.
