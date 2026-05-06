@@ -2,15 +2,28 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILLS_DIR="$REPO_DIR/codex/skills"
+TARGET_DIR="$HOME/.codex/skills"
 
-mkdir -p "$HOME/.codex/skills"
+mkdir -p "$TARGET_DIR"
 
-echo "Instalando skill pr-description..."
+echo "Instalando skills do repositório..."
 
-rm -rf "$HOME/.codex/skills/pr-description"
-cp -R "$REPO_DIR/codex/skills/pr-description" "$HOME/.codex/skills/pr-description"
+for skill_path in "$SKILLS_DIR"/*; do
+  if [[ ! -d "$skill_path" ]]; then
+    continue
+  fi
 
-chmod +x "$HOME/.codex/skills/pr-description/scripts/pr_context.sh"
+  skill_name="$(basename "$skill_path")"
+  echo "- $skill_name"
 
-echo "Skill instalada em:"
-echo "$HOME/.codex/skills/pr-description"
+  rm -rf "$TARGET_DIR/$skill_name"
+  cp -R "$skill_path" "$TARGET_DIR/$skill_name"
+
+  if [[ -d "$TARGET_DIR/$skill_name/scripts" ]]; then
+    chmod +x "$TARGET_DIR/$skill_name"/scripts/* || true
+  fi
+done
+
+echo "Skills instaladas em:"
+echo "$TARGET_DIR"
