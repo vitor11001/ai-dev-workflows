@@ -28,6 +28,9 @@ Durante a instalação:
 
 - as skills existentes em `~/.codex/skills` são copiadas para um backup em `~/.codex/skills-backup/<timestamp>/`, quando já houver versões anteriores;
 - scripts `.sh` dentro das skills instaladas recebem permissão de execução automaticamente.
+- o arquivo `codex/AGENTS.md` é copiado para `~/.codex/ai-dev-workflows/AGENTS.md`;
+- o instalador preserva o conteúdo existente em `~/.codex/AGENTS.md` e adiciona apenas uma diretiva `@.../ai-dev-workflows/AGENTS.md` quando ela ainda não existir;
+- se `~/.codex/AGENTS.md` já existir e precisar ser alterado, um backup `~/.codex/AGENTS.md.bak.<timestamp>` é criado antes.
 
 ## Uso
 

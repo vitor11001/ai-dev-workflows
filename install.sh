@@ -6,9 +6,15 @@ SKILLS_DIR="$REPO_DIR/codex/skills"
 TARGET_DIR="$HOME/.codex/skills"
 BACKUP_ROOT="$HOME/.codex/skills-backup"
 BACKUP_DIR="$BACKUP_ROOT/$(date +%Y%m%d-%H%M%S)"
+PROJECT_CONFIG_DIR="$HOME/.codex/ai-dev-workflows"
+PROJECT_AGENTS_SOURCE="$REPO_DIR/codex/AGENTS.md"
+PROJECT_AGENTS_TARGET="$PROJECT_CONFIG_DIR/AGENTS.md"
+USER_AGENTS_FILE="$HOME/.codex/AGENTS.md"
+INCLUDE_LINE="@${PROJECT_AGENTS_TARGET}"
 
 mkdir -p "$TARGET_DIR"
 mkdir -p "$BACKUP_ROOT"
+mkdir -p "$PROJECT_CONFIG_DIR"
 
 echo "Instalando skills do repositório..."
 
@@ -35,8 +41,31 @@ for skill_path in "$SKILLS_DIR"/*; do
   fi
 done
 
+cp "$PROJECT_AGENTS_SOURCE" "$PROJECT_AGENTS_TARGET"
+
+if [[ -f "$USER_AGENTS_FILE" ]]; then
+  if ! grep -Fqx "$INCLUDE_LINE" "$USER_AGENTS_FILE"; then
+    cp "$USER_AGENTS_FILE" "$USER_AGENTS_FILE.bak.$(date +%Y%m%d-%H%M%S)"
+    {
+      printf '\n'
+      printf '%s\n' "$INCLUDE_LINE"
+    } >> "$USER_AGENTS_FILE"
+  fi
+else
+  printf '%s\n' "$INCLUDE_LINE" > "$USER_AGENTS_FILE"
+fi
+
 echo "Skills instaladas em:"
 echo "$TARGET_DIR"
+echo
+echo "Projeto instalado em:"
+echo "$PROJECT_CONFIG_DIR"
+echo
+echo "Arquivo de instrucoes instalado em:"
+echo "$PROJECT_AGENTS_TARGET"
+echo
+echo "Diretiva garantida em:"
+echo "$USER_AGENTS_FILE"
 
 if [[ -d "$BACKUP_DIR" ]]; then
   echo "Backup das skills anteriores em:"
