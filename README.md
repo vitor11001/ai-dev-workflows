@@ -14,6 +14,7 @@ Workflows, agentes, skills e scripts auxiliares pessoais para usar com Codex e o
 - `codex/skills/code-review`: skill para revisar diffs e identificar riscos técnicos.
 - `codex/skills/commit-message`: skill para gerar mensagens de commit com base no diff.
 - `codex/skills/onboarding`: skill para mapear e resumir um projeto rapidamente.
+- `codex/skills/write-issue`: skill para investigar problemas na codebase e redigir issues para Plane.
 
 ### Guias
 
