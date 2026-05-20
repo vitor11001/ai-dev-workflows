@@ -1,0 +1,4 @@
+interface:
+  display_name: "Escrever Issue"
+  short_description: "Investigar e redigir issues para Plane"
+  default_prompt: "Use $write-issue para investigar o problema na codebase e redigir uma issue em Markdown no padrão do Plane."
