@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review"
+  short_description: "Revisao senior de PRs e diffs."
+  default_prompt: "Revise este PR como revisor tecnico senior, priorizando riscos reais de producao, regressões, contrato de API, seguranca, testes e boas praticas de codigo."
