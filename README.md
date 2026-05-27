@@ -7,18 +7,15 @@ Workflows, agentes, skills e scripts auxiliares pessoais para usar com Codex e o
 ### Codex
 
 - `codex/AGENTS.md`: instruções globais para uso do Codex neste repositório.
+- `codex/skills/implementation-workflow`: skill para executar tarefas de programação ponta a ponta com mapeamento, implementação, testes e validação.
 - `codex/skills/pr-description`: skill para gerar descrições de Pull Request com base no diff da branch atual.
   Ela também gera um título de PR e ignora arquivos de template de PR no contexto coletado.
-- `codex/skills/test-generator`: skill para gerar testes Python seguindo o `TESTING.md`.
-- `codex/skills/test-refactor`: skill para reorganizar e modernizar testes Python existentes.
+- `codex/skills/test-generator`: skill para gerar testes Python com padrões de `pytest`, Django e FastAPI incorporados.
+- `codex/skills/test-refactor`: skill para reorganizar e modernizar testes Python existentes com padrões de teste incorporados.
 - `codex/skills/code-review`: skill para revisar diffs e identificar riscos técnicos.
 - `codex/skills/commit-message`: skill para gerar mensagens de commit com base no diff.
 - `codex/skills/onboarding`: skill para mapear e resumir um projeto rapidamente.
 - `codex/skills/write-issue`: skill para investigar problemas na codebase e redigir issues para Plane.
-
-### Guias
-
-- `TESTING.md`: padrão de engenharia para criação e refatoração de testes Python por humanos e LLMs.
 
 ## Instalação
 
