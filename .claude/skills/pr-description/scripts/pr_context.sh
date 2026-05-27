@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Garante que não haverá travamento de tela (pager)
+export GIT_PAGER=cat
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "Erro: este diretório não está dentro de um repositório Git." >&2
+  exit 1
+fi
+
+CURRENT_BRANCH="$(git branch --show-current)"
+DIFF_EXCLUDES=(
+  ":(exclude).github/PULL_REQUEST_TEMPLATE"
+  ":(exclude).github/PULL_REQUEST_TEMPLATE.md"
+  ":(exclude).github/PULL_REQUEST_TEMPLATE/*"
+  ":(exclude).github/pull_request_template.md"
+  ":(exclude).github/pull_request_template/*"
+  ":(exclude)PULL_REQUEST_TEMPLATE.md"
+  ":(exclude)pull_request_template.md"
+)
+
+# Detecta a base branch (priorizando origin)
+if git rev-parse --verify origin/master >/dev/null 2>&1; then
+  BASE_BRANCH="origin/master"
+elif git rev-parse --verify origin/main >/dev/null 2>&1; then
+  BASE_BRANCH="origin/main"
+elif git rev-parse --verify master >/dev/null 2>&1; then
+  BASE_BRANCH="master"
+elif git rev-parse --verify main >/dev/null 2>&1; then
+  BASE_BRANCH="main"
+else
+  echo "Erro: Não foi possível encontrar master ou main." >&2
+  exit 1
+fi
+
+# Converte a branch detectada em um hash de commit para evitar
+# ambiguidade entre referências locais e remotas.
+BASE_HASH=$(git rev-parse "$BASE_BRANCH")
+
+echo "# Contexto para descrição de PR"
+echo ""
+echo "## Branch atual: $CURRENT_BRANCH"
+echo "## Branch base: $BASE_BRANCH ($BASE_HASH)"
+
+echo ""
+echo "## Arquivos alterados"
+git --no-pager diff --name-status "$BASE_HASH"..HEAD -- . "${DIFF_EXCLUDES[@]}"
+
+echo ""
+echo "## Diff stat"
+git --no-pager diff --stat "$BASE_HASH"..HEAD -- . "${DIFF_EXCLUDES[@]}"
+
+echo ""
+echo "## Diff completo"
+git --no-pager diff "$BASE_HASH"..HEAD -- . "${DIFF_EXCLUDES[@]}"

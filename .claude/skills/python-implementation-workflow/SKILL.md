@@ -1,6 +1,6 @@
 ---
-name: implementation-workflow
-description: executa tarefas de programação ponta a ponta como workflow de engenharia senior. use quando o usuário pedir para implementar, alterar, corrigir, refatorar ou evoluir código em um projeto, incluindo mapeamento inicial, preservação de padrões, implementação, testes e validação.
+name: python-implementation-workflow
+description: executa tarefas de programação Python ponta a ponta como workflow de engenharia senior. use quando o usuário pedir para implementar, alterar, corrigir, refatorar ou evoluir código em projetos Python, incluindo mapeamento inicial, preservação de padrões, implementação, testes e validação.
 ---
 
 # Workflow de Implementação
@@ -32,6 +32,16 @@ Quando esta skill for usada:
 8. Crie ou atualize testes para toda mudança comportamental.
 9. Pergunte antes de executar testes ou validações demoradas, salvo quando o usuário já tiver pedido explicitamente.
 10. Reporte claramente o que foi ou não foi executado.
+
+## Correção de bugs
+
+Quando a task for corrigir um bug, execute estas etapas antes de editar código:
+
+1. Reproduza o problema: confirme o comportamento incorreto com um exemplo concreto, caso de teste ou sequência de passos.
+2. Identifique a causa raiz, não o sintoma: entenda por que o bug acontece antes de propor correção.
+3. Verifique se deveria existir um teste cobrindo esse caso: a ausência de teste frequentemente é parte do bug.
+4. Corrija a causa raiz; evite adicionar condição protetora ou contornar o problema sem entender a origem.
+5. Adicione ou atualize o teste que deveria cobrir o caso que falhou.
 
 ## Planejamento
 
@@ -101,8 +111,8 @@ Quando esta skill for usada:
 ## Testes
 
 - Sempre crie ou atualize testes quando houver mudança de comportamento.
-- Use a skill `test-generator` para criar ou ampliar testes Python.
-- Use a skill `test-refactor` quando a task exigir reorganizar, consolidar ou modernizar testes existentes.
+- Use a skill `python-test-generator` para criar ou ampliar testes Python.
+- Use a skill `python-test-refactor` quando a task exigir reorganizar, consolidar ou modernizar testes existentes.
 - Reutilize factories, fixtures e helpers de teste existentes.
 - Se não for viável testar a mudança, explique o motivo e o risco residual.
 - Pergunte ao usuário se deve executar os testes relevantes antes de rodá-los.
