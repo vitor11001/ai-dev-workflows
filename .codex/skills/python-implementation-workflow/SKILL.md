@@ -81,9 +81,15 @@ Quando a task for corrigir um bug, execute estas etapas antes de editar código:
 - Prefira retornos antecipados a `if`s aninhados.
 - Mensagens de exceção devem incluir o valor inválido e o formato esperado quando isso ajudar o diagnóstico.
 
+### Imports
+
+- Todos os imports ficam no topo do arquivo, após o docstring de módulo quando houver.
+- Nunca coloque imports dentro de funções, métodos ou classes, salvo quando houver importação circular documentada — nesse caso, adicione um comentário curto explicando o ciclo.
+- Antes de introduzir um import inline, verifique se o ciclo é real movendo o import para o topo. Só use import local se o ciclo for confirmado.
+
 ### Estrutura de arquivos e classes
 
-- Evite variáveis globais; prefira atributos de instância ou atributos privados de classe. Exceção: serializers, onde variáveis de classe são convenção do framework.
+- Não crie variáveis globais em arquivos que contêm classes. Constantes e conjuntos usados por uma única classe devem ser atributos privados de classe (`_FORBIDDEN = frozenset(...)`), não variáveis soltas no módulo. Variáveis de módulo são aceitáveis apenas em arquivos puramente funcionais sem classes, ou quando são constantes públicas usadas por múltiplos módulos.
 - Cada arquivo deve conter no máximo uma classe, salvo quando o arquivo definir apenas classes de tipo (`TypedDict`, `dataclass` usado como estrutura de dados, `Enum`).
 - Em arquivos que contêm uma classe, não crie funções ou métodos soltos fora dela; toda lógica deve ser método da classe, método privado ou estar em módulo utilitário separado.
 
