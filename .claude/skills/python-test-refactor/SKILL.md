@@ -1,5 +1,5 @@
 ---
-name: test-refactor
+name: python-test-refactor
 description: refatora, consolida e reorganiza testes python existentes para pytest, django e fastapi, usando os padrões de teste incorporados nesta skill. use quando o usuário pedir para limpar testes legados, converter unittest, consolidar arquivos, renomear testes ou alinhar a suíte ao padrão atual.
 ---
 

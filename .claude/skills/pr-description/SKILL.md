@@ -41,7 +41,7 @@ Se o usuário pedir apenas para visualizar o resultado, mostre o título e a des
 Quando esta skill for usada:
 1. Trabalhe no repositório atual.
 2. Identifique a branch atual e a branch base (`main` ou `master`).
-3. **Coleta de Contexto:** Execute o script localizado em `ai-dev-workflows/codex/skills/pr-description/scripts/pr_context.sh` para obter o diff e as informações das mudanças.
+3. **Coleta de Contexto:** Execute o script localizado em `ai-dev-workflows/.claude/skills/pr-description/scripts/pr_context.sh` para obter o diff e as informações das mudanças.
 4. Gere um título curto e objetivo, fiel ao diff coletado pelo script.
 5. Gere uma descrição objetiva, fiel ao diff coletado pelo script.
 6. Escreva ambos em `pr_body.md`, mantendo título e descrição separados.

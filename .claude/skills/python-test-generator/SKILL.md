@@ -1,5 +1,5 @@
 ---
-name: test-generator
+name: python-test-generator
 description: gera ou amplia testes em python com pytest para django e fastapi, usando os padrões de teste incorporados nesta skill. use quando o usuário pedir para criar testes, adicionar cobertura, escrever testes para uma função, serviço, model, endpoint, controller ou fluxo.
 ---
 
