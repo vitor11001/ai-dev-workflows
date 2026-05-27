@@ -13,13 +13,13 @@
 - Não exponha tokens, chaves, credenciais ou dados sensíveis.
 - Não afirme que algo foi testado se não foi executado.
 
-## Testes Python
+## Skills do repositório
 
-- Ao gerar, revisar, refatorar ou reorganizar testes Python, use `TESTING.md` como contexto obrigatório.
-- Siga o guia para `pytest + Django` e `pytest + FastAPI`.
-- Espelhe a estrutura do código em `tests/unit/`, `tests/integration/` e `tests/e2e/`.
-- Prefira factories, fixtures pequenas e testes orientados a comportamento.
-- Não mantenha ou introduza padrões legados com `unittest.TestCase`, salvo pedido explícito.
+- As skills versionadas deste projeto ficam em `codex/skills/`.
+- Para executar tarefas de programação, use a skill `implementation-workflow`.
+- Para gerar testes Python, use a skill `test-generator`.
+- Para refatorar, consolidar ou reorganizar testes Python, use a skill `test-refactor`.
+- Não crie skills diretamente no computador do usuário; crie ou atualize skills dentro deste repositório.
 
 ## Escopo por Diretório
 

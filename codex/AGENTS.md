@@ -14,9 +14,10 @@
 
 ## Skills disponíveis em `codex/skills`
 
+- `implementation-workflow`: executa tarefas de programação ponta a ponta com mapeamento, implementação, testes e validação.
 - `pr-description`: gera descrições de pull request com base no diff da branch atual.
-- `test-generator`: gera testes Python com `pytest` seguindo o `TESTING.md`.
-- `test-refactor`: refatora, consolida e reorganiza testes Python existentes.
+- `test-generator`: gera testes Python com `pytest`, Django e FastAPI usando os padrões incorporados na própria skill.
+- `test-refactor`: refatora, consolida e reorganiza testes Python existentes usando os padrões incorporados na própria skill.
 - `code-review`: revisa diffs, branches e arquivos alterados com foco em bugs, regressões e riscos.
 - `commit-message`: gera mensagens de commit com base nas alterações atuais.
 - `onboarding`: analisa e resume a estrutura, arquitetura e convenções do projeto.
