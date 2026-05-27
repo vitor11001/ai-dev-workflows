@@ -2,72 +2,52 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS_DIR="$REPO_DIR/codex/skills"
-TARGET_DIR="$HOME/.codex/skills"
-BACKUP_ROOT="$HOME/.codex/skills-backup"
-BACKUP_DIR="$BACKUP_ROOT/$(date +%Y%m%d-%H%M%S)"
-PROJECT_CONFIG_DIR="$HOME/.codex/ai-dev-workflows"
-PROJECT_AGENTS_SOURCE="$REPO_DIR/codex/AGENTS.md"
-PROJECT_AGENTS_TARGET="$PROJECT_CONFIG_DIR/AGENTS.md"
-USER_AGENTS_FILE="$HOME/.codex/AGENTS.md"
-INCLUDE_LINE="@${PROJECT_AGENTS_TARGET}"
 
-mkdir -p "$TARGET_DIR"
-mkdir -p "$BACKUP_ROOT"
-mkdir -p "$PROJECT_CONFIG_DIR"
+chmod_repo_scripts() {
+  while IFS= read -r script_file; do
+    chmod +x "$script_file"
+  done < <(find "$REPO_DIR" -path "$REPO_DIR/.git" -prune -o -type f -name '*.sh' -print)
+}
 
-echo "Instalando skills do repositório..."
+run_installer() {
+  local mode="$1"
 
-for skill_path in "$SKILLS_DIR"/*; do
-  if [[ ! -d "$skill_path" ]]; then
-    continue
-  fi
+  case "$mode" in
+    copy | --copy | -c)
+      "$REPO_DIR/scripts/install-copy.sh"
+      ;;
+    symlink | link | --symlink | --link | -s)
+      "$REPO_DIR/scripts/install-symlink.sh"
+      ;;
+    *)
+      echo "Opcao invalida: $mode" >&2
+      exit 1
+      ;;
+  esac
+}
 
-  skill_name="$(basename "$skill_path")"
-  echo "- $skill_name"
+chmod_repo_scripts
 
-  if [[ -e "$TARGET_DIR/$skill_name" ]]; then
-    mkdir -p "$BACKUP_DIR"
-    cp -R "$TARGET_DIR/$skill_name" "$BACKUP_DIR/$skill_name"
-  fi
-
-  rm -rf "$TARGET_DIR/$skill_name"
-  cp -R "$skill_path" "$TARGET_DIR/$skill_name"
-
-  if [[ -d "$TARGET_DIR/$skill_name/scripts" ]]; then
-    while IFS= read -r script_file; do
-      chmod +x "$script_file"
-    done < <(find "$TARGET_DIR/$skill_name/scripts" -type f -name '*.sh')
-  fi
-done
-
-cp "$PROJECT_AGENTS_SOURCE" "$PROJECT_AGENTS_TARGET"
-
-if [[ -f "$USER_AGENTS_FILE" ]]; then
-  if ! grep -Fqx "$INCLUDE_LINE" "$USER_AGENTS_FILE"; then
-    cp "$USER_AGENTS_FILE" "$USER_AGENTS_FILE.bak.$(date +%Y%m%d-%H%M%S)"
-    {
-      printf '\n'
-      printf '%s\n' "$INCLUDE_LINE"
-    } >> "$USER_AGENTS_FILE"
-  fi
-else
-  printf '%s\n' "$INCLUDE_LINE" > "$USER_AGENTS_FILE"
+if [[ $# -gt 0 ]]; then
+  run_installer "$1"
+  exit 0
 fi
 
-echo "Skills instaladas em:"
-echo "$TARGET_DIR"
+echo "Escolha o modo de instalacao:"
+echo "1) Padrao: copiar skills para ~/.codex/skills"
+echo "2) Symlink: apontar skills para este repositorio"
 echo
-echo "Projeto instalado em:"
-echo "$PROJECT_CONFIG_DIR"
-echo
-echo "Arquivo de instrucoes instalado em:"
-echo "$PROJECT_AGENTS_TARGET"
-echo
-echo "Diretiva garantida em:"
-echo "$USER_AGENTS_FILE"
+read -r -p "Opcao [1-2]: " option
 
-if [[ -d "$BACKUP_DIR" ]]; then
-  echo "Backup das skills anteriores em:"
-  echo "$BACKUP_DIR"
-fi
+case "$option" in
+  1)
+    run_installer copy
+    ;;
+  2)
+    run_installer symlink
+    ;;
+  *)
+    echo "Opcao invalida: $option" >&2
+    exit 1
+    ;;
+esac
