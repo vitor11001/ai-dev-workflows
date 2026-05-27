@@ -81,6 +81,12 @@ Quando a task for corrigir um bug, execute estas etapas antes de editar código:
 - Prefira retornos antecipados a `if`s aninhados.
 - Mensagens de exceção devem incluir o valor inválido e o formato esperado quando isso ajudar o diagnóstico.
 
+### Estrutura de arquivos e classes
+
+- Evite variáveis globais; prefira atributos de instância ou atributos privados de classe. Exceção: serializers, onde variáveis de classe são convenção do framework.
+- Cada arquivo deve conter no máximo uma classe, salvo quando o arquivo definir apenas classes de tipo (`TypedDict`, `dataclass` usado como estrutura de dados, `Enum`).
+- Em arquivos que contêm uma classe, não crie funções ou métodos soltos fora dela; toda lógica deve ser método da classe, método privado ou estar em módulo utilitário separado.
+
 ### Heurísticas
 
 - Mantenha funções entre 4 e 20 linhas quando isso preservar clareza.
