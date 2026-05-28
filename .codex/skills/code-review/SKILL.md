@@ -32,12 +32,14 @@ Investigar, nesta ordem:
 - Transacoes, atomicidade, rollback parcial e efeitos colaterais em escritas.
 - Queries ineficientes, N+1, filtros no Python que deveriam estar no banco, paginacao incorreta e consultas sem escopo seguro.
 - Regressões em endpoints, modelos, serializers, tarefas, sinais, comandos e fluxos existentes.
+- Classes e metodos com nomes em idioma diferente do ingles.
 - Boas praticas de codigo quando afetarem manutencao, risco, clareza ou arquitetura.
 
 ## Boas Praticas De Codigo
 
 Avaliar boas praticas com peso tecnico, nao cosmetico. Apontar quando houver impacto real ou violacao explicita de convencao do projeto:
 
+- Classes e metodos devem sempre usar nomes em ingles. Ao encontrar classe ou metodo com nome em portugues, espanhol ou qualquer outro idioma diferente do ingles, reportar como erro de revisao mesmo que o comportamento esteja correto. Incluir o nome atual, o local e uma sugestao objetiva de renomeacao em ingles.
 - Nomes pouco especificos que dificultam manutencao ou busca.
 - Funcoes grandes, responsabilidades misturadas, acoplamento excessivo ou duplicacao relevante.
 - Tipagem ausente, imprecisa ou incoerente com o contrato.
