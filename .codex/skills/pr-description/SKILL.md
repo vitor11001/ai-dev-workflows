@@ -30,7 +30,7 @@ Use esta skill quando o usuário pedir algo como:
 O resultado final deve ser escrito em português brasileiro.
 
 Por padrão:
-- crie ou atualize `pr_body.md`;
+- crie ou atualize `tmp/pr-body-<branch-name>.md`, onde `<branch-name>` é o nome exato da branch atual;
 - escreva no mesmo arquivo um título curto, específico e fiel ao diff;
 - separe visualmente o título e a descrição em blocos distintos.
 
@@ -44,13 +44,13 @@ Quando esta skill for usada:
 3. **Coleta de Contexto:** Execute o script localizado em `ai-dev-workflows/.codex/skills/pr-description/scripts/pr_context.sh` para obter o diff e as informações das mudanças.
 4. Gere um título curto e objetivo, fiel ao diff coletado pelo script.
 5. Gere uma descrição objetiva, fiel ao diff coletado pelo script.
-6. Escreva ambos em `pr_body.md`, mantendo título e descrição separados.
+6. Escreva ambos em `tmp/pr-body-<branch-name>.md` (onde `<branch-name>` é a branch atual), mantendo título e descrição separados.
 7. Ignore templates de PR e não replique a estrutura deles na saída.
 8. Não faça commit e não publique no GitHub sem pedido explícito.
 
 ## Formato do arquivo
 
-O arquivo `pr_body.md` deve seguir esta estrutura:
+O arquivo `tmp/pr-body-<branch-name>.md` deve seguir esta estrutura:
 
 ```md
 # <titulo do PR>
