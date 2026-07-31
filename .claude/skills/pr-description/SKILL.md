@@ -1,101 +1,61 @@
 ---
 name: pr-description
-description: gera título e descrição de pull request para a branch atual usando commits, diff e arquivos alterados, ignorando templates de PR. use quando o usuário pedir em português para gerar, criar, montar, escrever, revisar, melhorar ou atualizar um título de PR, uma descrição de PR, pull request ou `pr_body.md`.
+description: Use quando houver pedido para criar, gerar, escrever, revisar, melhorar ou atualizar título ou descrição de Pull Request, PR, branch ou `pr_body.md`.
 ---
 
 # Descrição de Pull Request
 
-## Objetivo
+## Princípio
 
-Gerar uma descrição clara, objetiva e útil para revisão de código com base nas mudanças da branch atual.
-
-A descrição deve ajudar quem vai revisar o PR a entender:
-- O contexto da mudança;
-- O que foi modificado;
-- Quais impactos, riscos ou pontos de atenção existem.
-
-## Quando usar
-
-Use esta skill quando o usuário pedir algo como:
-- "gere a descrição do PR"
-- "crie a descrição do pull request"
-- "monta o texto do PR"
-- "gera o pr_body"
-- "atualize a descrição do PR"
-- "melhore a descrição do PR"
-- "me ajude a escrever a descrição do pull request"
-
-## Saída esperada
-
-O resultado final deve ser escrito em português brasileiro.
-
-Por padrão:
-- crie ou atualize `tmp/pr-body-<branch-name>.md`, onde `<branch-name>` é o nome exato da branch atual;
-- escreva no mesmo arquivo um título curto, específico e fiel ao diff;
-- separe visualmente o título e a descrição em blocos distintos.
-
-Se o usuário pedir apenas para visualizar o resultado, mostre o título e a descrição na conversa e não crie arquivos.
+Descrever o resultado líquido da branch para o revisor, com o menor texto que preserve contexto, comportamento e atenção necessária.
 
 ## Procedimento
 
-Quando esta skill for usada:
-1. Trabalhe no repositório atual.
-2. Identifique a branch atual e a branch base (`main` ou `master`).
-3. **Coleta de Contexto:** Execute o script localizado em `ai-dev-workflows/.claude/skills/pr-description/scripts/pr_context.sh` para obter o diff e as informações das mudanças.
-4. Gere um título curto e objetivo, fiel ao diff coletado pelo script.
-5. Gere uma descrição objetiva, fiel ao diff coletado pelo script.
-6. Escreva ambos em `tmp/pr-body-<branch-name>.md` (onde `<branch-name>` é a branch atual), mantendo título e descrição separados.
-7. Ignore templates de PR e não replique a estrutura deles na saída.
-8. Não faça commit e não publique no GitHub sem pedido explícito.
+1. Trabalhar no repositório atual.
+2. Executar `scripts/pr_context.sh`, localizado no diretório desta skill.
+   - Se o usuário informar a base, executar `scripts/pr_context.sh --base <ref>`.
+   - Se o script apontar bases ambíguas, pedir a base ao usuário antes de continuar.
+3. Interpretar o contexto nesta ordem:
+   1. **Diff final:** define o comportamento que efetivamente ficou na branch.
+   2. **Testes, contratos e migrations:** confirmam comportamento observável, compatibilidade e transições de dados.
+   3. **Commits:** explicam motivação, decisões e breaking changes, sem substituir o diff final.
+   4. **Nome da branch:** serve apenas como pista auxiliar.
+4. Identificar uma mudança principal e agrupar alterações de suporte sob esse resultado. Tratar arquivos gerados, serializers, schemas e testes relacionados como uma única mudança de contrato ou comportamento quando fizerem parte do mesmo efeito.
+5. Escrever o título e a descrição no formato abaixo.
+6. Por padrão, criar ou atualizar `tmp/pr-body-<branch-name>.md`.
+   - Se o usuário pedir apenas para visualizar, responder na conversa e não criar arquivo.
+7. Ignorar templates de PR. Não fazer commit nem publicar no GitHub sem pedido explícito.
 
-## Formato do arquivo
-
-O arquivo `tmp/pr-body-<branch-name>.md` deve seguir esta estrutura:
+## Formato
 
 ```md
-# <titulo do PR>
+# <título>
 
-## Contexto
-...
+<uma frase explicando o resultado do PR>
 
-## Modificações
-...
+- <mudança relevante>
+- <mudança relevante>
 
-## Impacto
-...
+**Atenção:** <breaking change, migration, risco de segurança ou ação operacional>
 ```
 
-## Formato do título
+Aplicar estas regras:
 
-O título deve:
-- ter no máximo 72 caracteres quando possível;
-- começar com verbo no infinitivo ou substantivo técnico claro;
-- descrever o efeito principal da mudança, sem prefixos genéricos como "Atualizações" ou "Ajustes";
-- não mencionar template, checklist ou conteúdo administrativo.
+- Limitar o título a 72 caracteres quando possível.
+- Começar o título com verbo no infinitivo ou substantivo técnico específico.
+- Usar uma frase de objetivo e no máximo três bullets.
+- Omitir bullets quando a frase de objetivo já for suficiente.
+- Incluir `**Atenção:**` somente quando o contexto demonstrar breaking change, migration ou transição de dados relevante, risco de segurança ou ação operacional necessária.
+- Omitir seções vazias e frases de preenchimento como “Não identificado pelo diff”.
+- Descrever comportamento e impacto para o revisor, não inventariar arquivos.
+- Não criar seção de testes por padrão.
 
-## Formato padrão (na ausência de template)
+## Verificação
 
-### ## Contexto
-Explique por que esta mudança existe. Se não estiver evidente, escreva: *Não identificado pelo diff.*
+Antes de entregar, confirmar:
 
-### ## Modificações
-Liste as alterações em bullets. Agrupe mudanças relacionadas.
-
-### ## Impacto
-Explique riscos, mudanças de comportamento, performance ou segurança. Se não houver, escreva: *Nenhum impacto relevante identificado pelo diff.*
-
-## Regras de escrita e segurança
-
-* **Idioma:** Português brasileiro, tom profissional e frases diretas.
-* **Precisão:** Não invente testes, contextos de produto, issues ou requisitos que não estejam explícitos no diff ou nos commits.
-* **Segurança:** Nunca inclua segredos, tokens, chaves ou credenciais na descrição.
-* **Fidelidade:** Se o script não retornar informações suficientes para uma seção, use "Não identificado pelo diff".
-* **Qualidade:** A descrição deve ser específica para o código alterado, evitando generalismos.
-* **Título:** O título deve resumir a mudança principal sem repetir literalmente o nome da branch, salvo se isso for necessário para clareza.
-
-## Critérios de Revisão
-Antes de entregar, garanta que a descrição responda:
-1. Por que o PR existe?
-2. O que exatamente mudou?
-3. Onde o revisor deve ter mais atenção?
-4. O título deixa claro o objetivo principal do PR?
+1. Cada afirmação possui evidência no diff final, nos testes ou nos commits.
+2. O texto descreve apenas mudanças posteriores ao merge-base.
+3. Nenhuma alteração intermediária removida pelo diff final aparece como resultado.
+4. O objetivo principal pode ser entendido sem ler os bullets.
+5. Não há segredos, credenciais, contexto de produto, issue ou teste inventado.
