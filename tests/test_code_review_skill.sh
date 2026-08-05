@@ -22,6 +22,11 @@ grep -Fq "fronteira em que o impacto foi alegado" "$codex_skill/SKILL.md"
 grep -Fq "handlers globais" "$codex_skill/references/finding-quality.md"
 grep -Fq "Teste de controller não confirma status HTTP" \
   "$codex_skill/references/finding-quality.md"
+grep -Fq 'Riscos preexistentes observados' "$codex_skill/SKILL.md"
+grep -Fq 'não altera o veredito' \
+  "$codex_skill/references/finding-quality.md"
+grep -Fq 'não iniciar auditoria ampla' \
+  "$codex_skill/references/finding-quality.md"
 
 for script_path in \
   "$codex_skill/scripts/review_context.sh" \
