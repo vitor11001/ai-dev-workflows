@@ -32,10 +32,14 @@ correção compatível com a arquitetura.
 8. Validar autorização, tenant, inputs externos, efeitos parciais, queries, paginação,
    compatibilidade e consumidores. Usar [references/review-surfaces.md](references/review-surfaces.md)
    para as superfícies tocadas pelo diff.
-9. Rodar os menores testes e gates capazes de provar ou refutar os riscos. Não corrigir o
-   código durante o review, salvo pedido explícito.
-10. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
-11. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
+9. Antes de inferir uma resposta externa a partir de comportamento interno, rastrear o
+   caminho completo até a fronteira: middleware, handlers globais, mapeadores de exceção,
+   transação, serializer, retry e adapter aplicáveis.
+10. Rodar os menores testes e gates capazes de provar ou refutar os riscos na mesma
+   fronteira em que o impacto foi alegado. Não corrigir o código durante o review, salvo
+   pedido explícito.
+11. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
+12. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
     revisão entregue ao usuário.
 
 ## Gate de qualidade do achado
@@ -45,15 +49,19 @@ Todo achado deve declarar:
 - **Arquivo/trecho** com linha ou símbolo pesquisável.
 - **Problema** e invariante violada.
 - **Impacto** observável.
+- **Evidência de fronteira:** reprodução na interface afetada ou prova causal que inclua
+  todos os interceptadores entre o trecho interno e o efeito alegado.
 - **Cenário de risco** reproduzível ou sequência causal completa.
 - **Atribuição:** introduzido; preexistente agravado; preexistente fora do escopo; ou
   dívida deliberada da cadeia.
 - **Confiança:** confirmado, demonstrado ou ponto de atenção.
 - **Sugestão de correção** objetiva.
 
-Se faltar evidência para afirmar o defeito, investigar mais. Se ainda faltar, rebaixar
-para ponto de atenção ou omitir. Não transformar gate vermelho em achado sem entender a
-causa e o plano de integração.
+Teste interno confirma apenas o comportamento interno observado. Não usar exceção de
+controller para afirmar status HTTP, nem falha de função para afirmar resultado de job,
+CLI ou evento, sem validar a fronteira correspondente. Se faltar evidência para afirmar o
+defeito, investigar mais. Se ainda faltar, rebaixar para ponto de atenção ou omitir. Não
+transformar gate vermelho em achado sem entender a causa e o plano de integração.
 
 ## Testes derivados da mudança
 
@@ -108,5 +116,6 @@ ou deixaram de se aplicar.
 - Bloquear stacked PR por dívida explicitamente destinada a uma branch posterior sem
   avaliar merge e rollout independentes.
 - Chamar hipótese de “bug” sem sequência causal ou estado final observável.
+- Inferir efeito externo de uma exceção interna sem ler handlers e testar a fronteira.
 - Confundir cobertura alta com cobertura do risco alterado.
 - Listar estilo e duplicação antes de domínio, segurança, contrato e escrita.
