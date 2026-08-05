@@ -1,125 +1,112 @@
 ---
 name: code-review
-description: Revisao tecnica senior de Pull Requests, branches, diffs ou arquivos alterados. Use quando o usuario pedir review/revisao tecnica/analise de PR, validacao antes de merge, segunda revisao apos ajustes, ou quiser encontrar bugs, regressões, problemas de dominio, seguranca, autorizacao, OpenAPI, testes, performance, paginacao, N+1 e boas praticas de codigo com foco em risco real.
+description: Use quando o usuário pedir review, revisão técnica ou validação antes de merge de Pull Request, branch, diff, commit ou arquivos alterados; também em segunda revisão após ajustes e investigação de bugs, regressões, domínio, segurança, autorização, OpenAPI, testes, performance, paginação ou N+1.
 ---
 
 # Technical PR Review
 
-## Objetivo
+## Princípio central
 
-Executar uma revisao tecnica senior, em PT-BR, priorizando riscos reais de producao, regressões, contrato, seguranca, dominio, testes e qualidade de codigo. Nao fazer revisao superficial nem focar em preferencias cosmeticas quando nao houver risco.
+Revisar risco real, não aparência. Um achado só entra no relatório quando liga uma
+invariante violada a um caminho de execução, impacto concreto, atribuição ao diff e
+correção compatível com a arquitetura.
 
-## Fluxo
+## Fluxo obrigatório
 
-1. Identificar o escopo real da revisao: branch atual, diff staged, diff unstaged, arquivos citados ou PR informado.
-2. Ler primeiro o diff e depois o menor contexto necessario: models, serializers, views, controllers, rotas, schema, testes e docs relacionados.
-3. Verificar se ha mudancas nao staged ou base de comparacao incomum; deixar isso claro quando impactar a revisao.
-4. Validar comportamento contra o contexto informado pelo usuario e contra as regras ja existentes no codigo.
-5. Rodar testes focados quando viavel. Se nao conseguir, explicar o motivo e nao inventar resultado.
-6. Reportar apenas achados acionaveis, com evidencia concreta. Se algo for suspeito mas nao comprovado, marcar como ponto de atencao.
-7. Ao finalizar a revisao, criar sempre um arquivo Markdown em `tmp/` na raiz do projeto revisado, com timestamp no inicio do nome no formato `YYYYMMDD-HHMMSS-code-review-<slug>.md`. O conteudo deve reproduzir a revisao entregue ao usuario, incluindo achados, testes faltantes, contrato, seguranca, performance e veredito. Se `tmp/` nao existir, cria-la antes de salvar.
+1. Ler todas as instruções aplicáveis ao repositório e à área alterada.
+2. Determinar branch, base real, merge-base, commits exclusivos, worktree e escopo. Em
+   repositório Git, executar `scripts/review_context.sh <base>` desta skill, resolvendo o
+   caminho a partir do diretório deste `SKILL.md`, quando a base for conhecida.
+3. Ler primeiro o diff; depois, apenas o contexto necessário: callers, models,
+   serializers, views, controllers, jobs, signals, rotas, schema, cliente gerado, testes e
+   decisões relacionadas.
+4. Para cada suspeita, comparar com a base usando `git show <base>:<arquivo>` ou
+   equivalente. Classificar a atribuição conforme [references/finding-quality.md](references/finding-quality.md).
+5. Derivar invariantes e superfícies de risco a partir do diff. Não usar checklist como
+   licença para inventar problemas.
+6. Se houver escrita, transação, lock, job concorrente ou estado lido antes de gravar, ler
+   [references/concurrency-transactions.md](references/concurrency-transactions.md) e montar
+   ao menos uma interleaving adversarial.
+7. Se houver API, evento, schema, CLI ou artefato gerado, ler
+   [references/api-contract-rollout.md](references/api-contract-rollout.md).
+8. Validar autorização, tenant, inputs externos, efeitos parciais, queries, paginação,
+   compatibilidade e consumidores. Usar [references/review-surfaces.md](references/review-surfaces.md)
+   para as superfícies tocadas pelo diff.
+9. Rodar os menores testes e gates capazes de provar ou refutar os riscos. Não corrigir o
+   código durante o review, salvo pedido explícito.
+10. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
+11. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
+    revisão entregue ao usuário.
 
-## Prioridades De Revisao
+## Gate de qualidade do achado
 
-Investigar, nesta ordem:
+Todo achado deve declarar:
 
-- Bugs funcionais e regressões de comportamento.
-- Quebras de regra de dominio, especialmente confusao entre item unico e grupo.
-- Autenticacao, autorizacao, escopo por usuario, grupo, organizacao ou tenant.
-- Validacoes ausentes ou insuficientes em input externo.
-- Contrato de API e OpenAPI divergente do codigo, incluindo status codes, schemas, permissoes, paginacao, exemplos e response body.
-- Testes faltantes, frageis, falsos positivos ou que nao cobrem caminho critico.
-- Transacoes, atomicidade, rollback parcial e efeitos colaterais em escritas.
-- Queries ineficientes, N+1, filtros no Python que deveriam estar no banco, paginacao incorreta e consultas sem escopo seguro.
-- Regressões em endpoints, modelos, serializers, tarefas, sinais, comandos e fluxos existentes.
-- Classes e metodos com nomes em idioma diferente do ingles.
-- Boas praticas de codigo quando afetarem manutencao, risco, clareza ou arquitetura.
+- **Arquivo/trecho** com linha ou símbolo pesquisável.
+- **Problema** e invariante violada.
+- **Impacto** observável.
+- **Cenário de risco** reproduzível ou sequência causal completa.
+- **Atribuição:** introduzido; preexistente agravado; preexistente fora do escopo; ou
+  dívida deliberada da cadeia.
+- **Confiança:** confirmado, demonstrado ou ponto de atenção.
+- **Sugestão de correção** objetiva.
 
-## Boas Praticas De Codigo
+Se faltar evidência para afirmar o defeito, investigar mais. Se ainda faltar, rebaixar
+para ponto de atenção ou omitir. Não transformar gate vermelho em achado sem entender a
+causa e o plano de integração.
 
-Avaliar boas praticas com peso tecnico, nao cosmetico. Apontar quando houver impacto real ou violacao explicita de convencao do projeto:
+## Testes derivados da mudança
 
-- Classes e metodos devem sempre usar nomes em ingles. Ao encontrar classe ou metodo com nome em portugues, espanhol ou qualquer outro idioma diferente do ingles, reportar como erro de revisao mesmo que o comportamento esteja correto. Incluir o nome atual, o local e uma sugestao objetiva de renomeacao em ingles.
-- Nomes pouco especificos que dificultam manutencao ou busca.
-- Funcoes grandes, responsabilidades misturadas, acoplamento excessivo ou duplicacao relevante.
-- Tipagem ausente, imprecisa ou incoerente com o contrato.
-- Dependencias globais quando o projeto espera injecao por construtor ou parametro.
-- Comentarios/docstrings divergentes do comportamento.
-- Reexports/facades temporarios sem consumidor real ou sem prazo de remocao.
-- Serializers, views ou controllers assumindo detalhes de outro dominio sem fronteira clara.
-- Arquivos que misturam classes com funcoes/metodos soltos, exceto arquivos de testes. Quando encontrar isso, apontar como achado se a regra do projeto existir ou se a mistura prejudicar arquitetura/manutencao; sugerir mover para metodo privado da classe, service/controller dedicado ou modulo utilitario focado.
+| Mudança | Verificação mínima |
+|---|---|
+| Escrita persistente | sucesso, recusa, rollback, idempotência e concorrência relevante |
+| Permissão/tenant | anônimo, papel inferior, papel permitido e recurso alheio |
+| Endpoint/serializer | payload válido, inválido, ausente, status e response body |
+| OpenAPI/gerado | implementação, schema versionado, geração e consumidor |
+| Query/listagem | escopo, paginação, ordenação e contagem de queries |
+| Signal/job/task | retry, duplicidade, efeito parcial e execução concorrente |
 
-## Severidade
+Teste faltante só é achado quando deixa risco relevante sem prova. Caso contrário,
+registrar como lacuna menor ou não listar.
 
-Classificar achados assim:
+## Severidade e veredito
 
-- Critica: seguranca, vazamento de dados, perda/corrupcao de dados, indisponibilidade provavel ou regressao grave em fluxo central.
-- Alta: bug funcional importante, quebra de tenant/autorizacao, contrato de API que quebra cliente, escrita inconsistente ou risco serio de producao.
-- Media: comportamento incorreto em cenario comum, teste critico ausente, performance ruim plausivel, OpenAPI incompleto que prejudica integracao.
-- Baixa: convencao importante, lacuna de teste menor, manutencao ou clareza com baixo risco imediato.
+- **Crítica:** vazamento, corrupção/perda de dados, indisponibilidade provável ou
+  regressão grave central → **Bloquear aprovação**.
+- **Alta:** bug funcional importante, quebra de tenant/autorização/cliente, escrita
+  inconsistente ou risco sério → no mínimo **Requer ajustes antes de aprovar**.
+- **Média:** comportamento incorreto comum, teste crítico ausente, performance plausível
+  ou contrato incompleto → normalmente **Requer ajustes antes de aprovar**.
+- **Baixa:** convenção explícita, manutenção ou cobertura menor → **Aprovável com ajustes
+  menores** quando forem os únicos achados.
+- Sem achado relevante → **Aprovável**.
 
-Nao elevar severidade por gosto pessoal. Explicar o cenario que reproduz ou evidencia o risco.
+Não elevar severidade por gosto. Explicar frequência, alcance, detectabilidade e
+reversibilidade quando influenciarem a classificação.
 
-## Formato Da Resposta
+## Formato da resposta
 
-Responder em portugues com esta estrutura quando o usuario pedir uma revisao completa:
+1. `### Resumo executivo`
+2. `### Achados` — ordenar por severidade; dizer explicitamente quando não houver.
+3. `### Testes faltantes`
+4. `### OpenAPI e contrato de API`
+5. `### Segurança e autorização`
+6. `### Banco, transações e performance`
+7. `### Regressões possíveis`
+8. `### Itens sem problema encontrado`
+9. `### Validações executadas`
+10. `### Veredito` — escolher exatamente uma opção definida acima.
 
-### Resumo executivo
+Começar pelos achados quando o usuário pedir apenas “review”. Em segunda revisão,
+revalidar o estado atual e registrar quais achados anteriores foram corrigidos, permanecem
+ou deixaram de se aplicar.
 
-Poucas frases dizendo se o PR parece seguro e quais riscos relevantes existem.
+## Erros comuns
 
-### Achados críticos
-
-Listar apenas problemas reais. Para cada achado:
-
-#### [Severidade: Crítica/Alta/Média/Baixa] Título
-
-- **Arquivo/trecho:** caminho e funcao/metodo/linha quando possivel.
-- **Problema:** o que esta errado.
-- **Impacto:** consequencia pratica.
-- **Cenario de risco:** exemplo que reproduz ou evidencia.
-- **Sugestao de correcao:** acao objetiva.
-
-Se nao houver achados relevantes, dizer explicitamente.
-
-### Testes faltantes
-
-Listar cenario, comportamento esperado e tipo sugerido: unitario, integracao, contrato/API, performance ou regressao.
-
-### OpenAPI e contrato de API
-
-Avaliar completude, divergencias, status codes, schemas, validacoes, permissoes, paginacao e exemplos.
-
-### Segurança e autorização
-
-Avaliar autenticacao, permissao, escopo por tenant/organizacao, acesso cruzado e exposicao indevida.
-
-### Banco, transações e performance
-
-Avaliar atomicidade, rollback, N+1, paginacao, filtros, consultas caras e updates/deletes sem escopo.
-
-### Regressões possíveis
-
-Listar comportamentos existentes que podem ter sido alterados sem intencao.
-
-### Itens sem problema encontrado
-
-Listar brevemente topicos revisados sem problemas relevantes.
-
-### Veredito
-
-Escolher exatamente um:
-
-- **Aprovável:** sem problemas relevantes.
-- **Aprovável com ajustes menores:** melhorias de baixo risco.
-- **Requer ajustes antes de aprovar:** riscos medios/altos.
-- **Bloquear aprovação:** risco critico, seguranca, perda de dados ou regressao seria.
-
-## Regras De Qualidade
-
-- Comecar pelos achados quando o usuario pedir "review" e nao exigir outro formato.
-- Nao inventar problema. Se nao houver evidencia, marcar como ponto de atencao.
-- Preferir referencias de arquivo clicaveis e linhas exatas.
-- Distinguir bug real de melhoria.
-- Nao omitir teste ou contrato quando o PR altera API.
-- Ao revisar novamente apos ajustes, revalidar o estado atual e nao assumir que achados anteriores ainda existem.
+- Revisar apenas linhas adicionadas e ignorar callers ou writers concorrentes.
+- Reportar bug da base como se tivesse sido introduzido pelo PR.
+- Bloquear stacked PR por dívida explicitamente destinada a uma branch posterior sem
+  avaliar merge e rollout independentes.
+- Chamar hipótese de “bug” sem sequência causal ou estado final observável.
+- Confundir cobertura alta com cobertura do risco alterado.
+- Listar estilo e duplicação antes de domínio, segurança, contrato e escrita.
