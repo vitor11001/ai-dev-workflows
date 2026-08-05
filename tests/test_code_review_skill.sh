@@ -18,6 +18,11 @@ for relative_path in "${required_files[@]}"; do
   cmp "$codex_skill/$relative_path" "$claude_skill/$relative_path"
 done
 
+grep -Fq "fronteira em que o impacto foi alegado" "$codex_skill/SKILL.md"
+grep -Fq "handlers globais" "$codex_skill/references/finding-quality.md"
+grep -Fq "Teste de controller não confirma status HTTP" \
+  "$codex_skill/references/finding-quality.md"
+
 for script_path in \
   "$codex_skill/scripts/review_context.sh" \
   "$claude_skill/scripts/review_context.sh"; do
