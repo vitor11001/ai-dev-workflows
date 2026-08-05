@@ -9,7 +9,8 @@ description: Use quando o usuário pedir review, revisão técnica ou validaçã
 
 Revisar risco real, não aparência. Um achado só entra no relatório quando liga uma
 invariante violada a um caminho de execução, impacto concreto, atribuição ao diff e
-correção compatível com a arquitetura.
+correção compatível com a arquitetura. Bug preexistente relevante encontrado no contexto
+necessário não vira achado da branch, mas também não é descartado.
 
 ## Fluxo obrigatório
 
@@ -32,14 +33,17 @@ correção compatível com a arquitetura.
 8. Validar autorização, tenant, inputs externos, efeitos parciais, queries, paginação,
    compatibilidade e consumidores. Usar [references/review-surfaces.md](references/review-surfaces.md)
    para as superfícies tocadas pelo diff.
-9. Antes de inferir uma resposta externa a partir de comportamento interno, rastrear o
+9. Se o contexto necessário revelar bug preexistente concreto que não foi agravado pelo
+   diff, classificá-lo conforme [references/finding-quality.md](references/finding-quality.md)
+   sem ampliar a busca para uma auditoria do repositório.
+10. Antes de inferir uma resposta externa a partir de comportamento interno, rastrear o
    caminho completo até a fronteira: middleware, handlers globais, mapeadores de exceção,
    transação, serializer, retry e adapter aplicáveis.
-10. Rodar os menores testes e gates capazes de provar ou refutar os riscos na mesma
+11. Rodar os menores testes e gates capazes de provar ou refutar os riscos na mesma
    fronteira em que o impacto foi alegado. Não corrigir o código durante o review, salvo
    pedido explícito.
-11. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
-12. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
+12. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
+13. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
     revisão entregue ao usuário.
 
 ## Gate de qualidade do achado
@@ -62,6 +66,11 @@ controller para afirmar status HTTP, nem falha de função para afirmar resultad
 CLI ou evento, sem validar a fronteira correspondente. Se faltar evidência para afirmar o
 defeito, investigar mais. Se ainda faltar, rebaixar para ponto de atenção ou omitir. Não
 transformar gate vermelho em achado sem entender a causa e o plano de integração.
+
+Problema preexistente fora do escopo nunca entra em `Achados`. Registrá-lo em `Riscos
+preexistentes observados` somente quando estiver confirmado ou demonstrado, tiver impacto
+material e surgir dos arquivos e fluxos que precisaram ser lidos para revisar o diff.
+Hipótese, estilo e dívida de manutenção comum continuam omitidos.
 
 ## Testes derivados da mudança
 
@@ -90,20 +99,23 @@ registrar como lacuna menor ou não listar.
 - Sem achado relevante → **Aprovável**.
 
 Não elevar severidade por gosto. Explicar frequência, alcance, detectabilidade e
-reversibilidade quando influenciarem a classificação.
+reversibilidade quando influenciarem a classificação. Risco preexistente observado não
+altera o veredito da branch; deixar explícito que precisa de issue ou correção separada.
 
 ## Formato da resposta
 
 1. `### Resumo executivo`
 2. `### Achados` — ordenar por severidade; dizer explicitamente quando não houver.
-3. `### Testes faltantes`
-4. `### OpenAPI e contrato de API`
-5. `### Segurança e autorização`
-6. `### Banco, transações e performance`
-7. `### Regressões possíveis`
-8. `### Itens sem problema encontrado`
-9. `### Validações executadas`
-10. `### Veredito` — escolher exatamente uma opção definida acima.
+3. `### Riscos preexistentes observados` — incluir só quando houver bug material e
+   comprovado; declarar que não pertence ao diff e não altera o veredito.
+4. `### Testes faltantes`
+5. `### OpenAPI e contrato de API`
+6. `### Segurança e autorização`
+7. `### Banco, transações e performance`
+8. `### Regressões possíveis`
+9. `### Itens sem problema encontrado`
+10. `### Validações executadas`
+11. `### Veredito` — escolher exatamente uma opção definida acima.
 
 Começar pelos achados quando o usuário pedir apenas “review”. Em segunda revisão,
 revalidar o estado atual e registrar quais achados anteriores foram corrigidos, permanecem
@@ -113,6 +125,8 @@ ou deixaram de se aplicar.
 
 - Revisar apenas linhas adicionadas e ignorar callers ou writers concorrentes.
 - Reportar bug da base como se tivesse sido introduzido pelo PR.
+- Omitir bug preexistente material já comprovado só porque ele não pertence ao diff.
+- Expandir a revisão da branch para procurar problemas não relacionados no repositório.
 - Bloquear stacked PR por dívida explicitamente destinada a uma branch posterior sem
   avaliar merge e rollout independentes.
 - Chamar hipótese de “bug” sem sequência causal ou estado final observável.
