@@ -98,6 +98,21 @@ Preferir texto flat, conciso e fácil de colar no Plane:
 
 Não usar H1, bloco de código Gherkin, colunas múltiplas, decoração excessiva ou seções extras sem necessidade.
 
+### Publicação Pela API Do Plane
+
+Quando publicar a issue pela API usando `description_html`, converter cada checkbox da `Definition of done` para a estrutura de task list esperada pelo editor do Plane:
+
+```html
+<ul data-type="taskList">
+  <li data-type="taskItem" data-checked="false">
+    <label contenteditable="false"><input type="checkbox"><span></span></label>
+    <div><p>Resultado verificável</p></div>
+  </li>
+</ul>
+```
+
+Repetir o elemento `li` completo para cada resultado da checklist. Depois de publicar ou atualizar, reler o work item pela API e confirmar que todos os itens persistiram com `data-type="taskItem"` e `data-checked="false"` antes de informar sucesso.
+
 ## Entrega
 
 Sempre exibir o corpo completo da issue em Markdown antes de qualquer ação adicional. Se houver desdobramentos, listar depois da issue em poucas linhas.
