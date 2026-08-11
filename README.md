@@ -12,7 +12,7 @@ O repositório mantém dois conjuntos paralelos de skills com o mesmo conteúdo,
 ### `.codex/`
 
 - `.codex/AGENTS.md`: instruções globais para uso do Codex neste repositório.
-- `.codex/skills/implementation-workflow`: executa tarefas de programação ponta a ponta com mapeamento, implementação, testes e validação.
+- `.codex/skills/python-implementation-workflow`: executa tarefas de programação Python ponta a ponta, em fases, com mapeamento, implementação, testes e validação.
 - `.codex/skills/pr-description`: gera descrições de Pull Request com base no diff da branch atual. Também gera um título de PR e ignora arquivos de template de PR no contexto coletado.
 - `.codex/skills/test-generator`: gera testes Python com padrões de `pytest`, Django e FastAPI incorporados.
 - `.codex/skills/test-refactor`: reorganiza e moderniza testes Python existentes com padrões de teste incorporados.
@@ -20,6 +20,7 @@ O repositório mantém dois conjuntos paralelos de skills com o mesmo conteúdo,
 - `.codex/skills/commit-message`: gera mensagens de commit com base no diff.
 - `.codex/skills/onboarding`: mapeia e resume um projeto rapidamente.
 - `.codex/skills/write-issue`: investiga problemas na codebase e redige issues para Plane.
+- `.codex/skills/task-planner`: planeja tasks técnicas, issues, PRs e branches em Markdown.
 
 ### `.claude/`
 
