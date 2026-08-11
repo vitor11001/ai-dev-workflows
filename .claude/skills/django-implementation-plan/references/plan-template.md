@@ -46,19 +46,54 @@ Camada sem trabalho recebe "nada a fazer" — explícito.
 ### 7. Admin
 ### 8. Documentação
 
+## Rastreabilidade
+
+| Requisito da issue | Atendido em |
+|---|---|
+| <requisito> | <camadas> |
+
+Requisito sem linha é furo. Camada sem requisito é escopo inflado.
+
+## Impacto em quem já consome
+
+Quem depende hoje do que vai mudar: outro app, task, command, signal, admin, teste,
+contrato do frontend. Cite o que encontrou com `rg` e o que precisa ser ajustado
+junto. Se nada consome, escreva "nada consome hoje" — é resultado, não omissão.
+
+## Bordas
+
+| Borda | Comportamento esperado |
+|---|---|
+| Vazio, nulo, zero | |
+| Registro inexistente | |
+| Estado já aplicado | |
+| Concorrência | |
+| Volume | |
+| Tenant alheio | |
+| Sem permissão | |
+
+"Não se aplica, porque X" é resposta válida. Célula em branco, não.
+
+## Dado existente e reversão
+
+- Valor das linhas já existentes para campo novo.
+- Dado atual que viola a regra nova; backfill ou limpeza necessários.
+- A migration reverte?
+- Dá para desligar em produção sem reverter o deploy?
+
 ## Divisão em PRs
 
 Para cada PR: o que entrega, camadas que toca, do que depende, como verificar.
 Se couber em um só, diga isso.
 
-## Riscos e cuidados
-
-Migration em tabela grande, mudança de contrato consumida pelo frontend, efeito em
-dado existente, concorrência, volume. O que pode dar errado e o que observar.
-
 ## Decisões fechadas
 
 Em linguagem afirmativa, numeradas. Sem pergunta aqui.
+
+## Incertezas assumidas
+
+O que não foi possível confirmar, a suposição adotada e o impacto se ela estiver
+errada. Não bloqueia a implementação — muda o risco.
 
 ## Perguntas pendentes
 

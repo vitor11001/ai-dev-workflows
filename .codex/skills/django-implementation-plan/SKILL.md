@@ -42,9 +42,10 @@ não aparece agora: aparece como retrabalho na implementação, quando já custa
    status, permissão. É o que amarra todas as camadas.
 4. **Decomponha por camada**, na ordem de dependência.
 5. **Corte em PRs**, se o trabalho não couber em um.
-6. **Escreva o arquivo.**
-7. **Revise o que escreveu** — ver "Auto-revisão".
-8. **Entregue para o usuário revisar e espere** — ver "Gate de revisão".
+6. **Varra os furos** — ver "Varreduras anti-furo".
+7. **Escreva o arquivo.**
+8. **Revise o que escreveu** — ver "Auto-revisão".
+9. **Entregue para o usuário revisar e espere** — ver "Gate de revisão".
 
 ## Investigação
 
@@ -147,6 +148,65 @@ Regras do corte:
 No plano, para cada PR: **o que entrega, quais camadas toca, de que depende, e como
 é verificado.**
 
+## Varreduras anti-furo
+
+Cobertura de camada não é cobertura de requisito. As cinco varreduras abaixo pegam
+o que a decomposição deixa passar. Faça todas antes de escrever o documento.
+
+### 1. Rastreabilidade requisito ↔ camada
+
+Ligue cada requisito da issue à camada que o atende. O valor está em ser
+**bidirecional**:
+
+- requisito sem camada → **furo**: algo foi pedido e ninguém faz;
+- camada sem requisito → **escopo inflado**: trabalho que ninguém pediu.
+
+### 2. Impacto em quem já consome
+
+Para cada model, método, rota ou constante que muda, procure quem depende hoje:
+
+```
+rg "<nome>" --type py
+```
+
+Cheque explicitamente outro app, task, management command, signal, admin, teste e
+o contrato do frontend. **Consumidor esquecido é a causa mais comum de regressão
+em mudança bem planejada.**
+
+Task já enfileirada merece atenção própria: mudar a assinatura de uma task quebra
+as mensagens que ainda estão na fila.
+
+### 3. Bordas obrigatórias
+
+Cada linha recebe o comportamento esperado ou "não se aplica, porque X". Silêncio
+não é resposta.
+
+| Borda | A pergunta |
+|---|---|
+| Vazio, nulo, zero | o que acontece com entrada ausente ou coleção vazia? |
+| Inexistente | e se o registro referenciado não existir? |
+| Estado já aplicado | repetir duplica efeito, ou é idempotente? |
+| Concorrência | dois requests simultâneos no mesmo registro? |
+| Volume | funciona com 10; e com 100 mil? |
+| Tenant alheio | usuário de outro cliente alcança isso? |
+| Sem permissão | qual comportamento e qual status? |
+
+### 4. Dado existente e reversão
+
+- Campo novo em tabela que já tem linhas: que valor elas recebem?
+- A regra nova é violada por dado que já existe? Precisa de backfill ou limpeza antes?
+- A migration reverte? Se não reverte, diga.
+- Dá para desligar em produção sem reverter o deploy?
+
+### 5. Incertezas assumidas
+
+O que você não conseguiu confirmar vira seção do documento, com a suposição feita e
+o impacto caso ela esteja errada. **Suposição nomeada é informação; suposição
+silenciosa vira bug.**
+
+Não confunda com "Perguntas pendentes": pendência bloqueia a implementação,
+incerteza não bloqueia mas muda o risco.
+
 ## Perguntas progressivas
 
 Não despeje todas as dúvidas de uma vez. Trabalhe por blocos, e só avance quando o
@@ -201,7 +261,9 @@ partir dele — não com os olhos de quem acabou de escrever.
    O que não pode é ficar no corpo parecendo decidido.
 2. **Contradição.** Alguma camada assume algo que outra decidiu diferente? O
    contrato bate com o que a view e o serializer descrevem?
-3. **Camada pulada.** As oito foram percorridas, inclusive as com "nada a fazer"?
+3. **Cobertura.** As oito camadas foram percorridas, inclusive as com "nada a
+   fazer"? As cinco varreduras foram feitas — rastreabilidade sem furo, impacto
+   mapeado, bordas respondidas?
 4. **Invenção.** Todo campo, método e rota citados existem no código, ou estão
    marcados explicitamente como criação nova?
 5. **PR acoplado.** Algum PR proposto só é revisável abrindo outro? Cada um tem
