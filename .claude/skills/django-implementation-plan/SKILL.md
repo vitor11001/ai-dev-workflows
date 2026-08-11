@@ -31,6 +31,9 @@ alterar não. Se ao final o usuário pedir para implementar, aí sim use a skill
 
 ## Procedimento
 
+**Crie uma tarefa para cada item abaixo e conclua na ordem.** Etapa pulada aqui
+não aparece agora: aparece como retrabalho na implementação, quando já custa caro.
+
 1. **Entenda a demanda.** Leia a issue, o pedido ou a conversa. Separe o que é
    requisito do que é sugestão de solução.
 2. **Investigue o código.** Um plano não ancorado no que existe é ficção — ver
@@ -39,8 +42,9 @@ alterar não. Se ao final o usuário pedir para implementar, aí sim use a skill
    status, permissão. É o que amarra todas as camadas.
 4. **Decomponha por camada**, na ordem de dependência.
 5. **Corte em PRs**, se o trabalho não couber em um.
-6. **Escreva o arquivo** e reporte o caminho, as decisões fechadas e o que ficou
-   pendente.
+6. **Escreva o arquivo.**
+7. **Revise o que escreveu** — ver "Auto-revisão".
+8. **Entregue para o usuário revisar e espere** — ver "Gate de revisão".
 
 ## Investigação
 
@@ -187,13 +191,40 @@ descubra.
 - Ao atualizar o plano, informe o caminho e o que mudou — não cole o documento
   inteiro, salvo pedido.
 
-## Critérios de revisão
+## Auto-revisão
 
-Antes de entregar, confirme:
-1. Alguém consegue implementar a partir deste plano sem adivinhar?
-2. Cada camada foi percorrida e decidida, inclusive as sem trabalho?
-3. O contrato está fechado — rota, payload, resposta, permissão, status?
-4. Os PRs propostos são revisáveis sozinhos e não travam uns aos outros?
-5. Cada PR tem teste e critério de verificação?
-6. As pendências restantes realmente bloqueiam a implementação?
-7. O arquivo está em `tmp/planning/<issue>/` e começa pela data?
+Depois de escrever, releia o documento com os olhos de quem vai implementar a
+partir dele — não com os olhos de quem acabou de escrever.
+
+1. **Pendência disfarçada.** Sobrou "TBD", "a definir", "provavelmente" ou campo
+   sem nome no meio do plano? Ou você decide, ou move para "Perguntas pendentes".
+   O que não pode é ficar no corpo parecendo decidido.
+2. **Contradição.** Alguma camada assume algo que outra decidiu diferente? O
+   contrato bate com o que a view e o serializer descrevem?
+3. **Camada pulada.** As oito foram percorridas, inclusive as com "nada a fazer"?
+4. **Invenção.** Todo campo, método e rota citados existem no código, ou estão
+   marcados explicitamente como criação nova?
+5. **PR acoplado.** Algum PR proposto só é revisável abrindo outro? Cada um tem
+   teste e critério de verificação?
+6. **Pendência que não bloqueia.** As perguntas que restaram realmente impedem
+   implementar, ou dá para decidir agora e seguir?
+7. **Caminho.** O arquivo está em `tmp/planning/<issue>/` e começa pela data?
+
+Corrija inline e siga. Não precisa revisar de novo.
+
+## Gate de revisão
+
+Depois da auto-revisão, entregue e **espere**. Não invoque
+`python-implementation-workflow`, não escreva código e não comece nada antes do
+usuário aprovar:
+
+```md
+Plano escrito em `<caminho>`.
+Decisões fechadas: <n>. Pendências: <n>.
+Revise antes de eu passar para a implementação.
+```
+
+Se o usuário pedir mudança, ajuste o documento e rode a auto-revisão outra vez.
+
+O gate existe porque o plano é a entrada do `python-implementation-workflow`: erro
+que passa daqui vira código errado, e aí custa muito mais para desfazer.
