@@ -14,13 +14,13 @@ O repositório mantém dois conjuntos paralelos de skills com o mesmo conteúdo,
 - `.codex/AGENTS.md`: instruções globais para uso do Codex neste repositório.
 - `.codex/skills/python-implementation-workflow`: executa tarefas de programação Python ponta a ponta, em fases, com mapeamento, implementação, testes e validação.
 - `.codex/skills/pr-description`: gera descrições de Pull Request com base no diff da branch atual. Também gera um título de PR e ignora arquivos de template de PR no contexto coletado.
-- `.codex/skills/test-generator`: gera testes Python com padrões de `pytest`, Django e FastAPI incorporados.
-- `.codex/skills/test-refactor`: reorganiza e moderniza testes Python existentes com padrões de teste incorporados.
+- `.codex/skills/django-tests`: cria, amplia e refatora testes Django/DRF com `pytest`, incluindo a receita de testes por camada.
 - `.codex/skills/code-review`: revisa diffs e identifica riscos técnicos.
 - `.codex/skills/commit-message`: gera mensagens de commit com base no diff.
 - `.codex/skills/onboarding`: mapeia e resume um projeto rapidamente.
 - `.codex/skills/write-issue`: investiga problemas na codebase e redige issues para Plane.
 - `.codex/skills/task-planner`: planeja tasks técnicas, issues, PRs e branches em Markdown.
+- `.codex/skills/django-layered-architecture`: estrutura projetos e apps Django/DRF em camadas e decide em qual camada cada código deve morar.
 
 ### `.claude/`
 

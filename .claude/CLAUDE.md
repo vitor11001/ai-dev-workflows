@@ -14,12 +14,12 @@
 
 ## Skills disponíveis em `.claude/skills`
 
-- `python-implementation-workflow`: executa tarefas de programação Python ponta a ponta com mapeamento, implementação, testes e validação.
+- `python-implementation-workflow`: executa tarefas de programação Python ponta a ponta, em fases, com mapeamento, implementação, testes e validação.
 - `pr-description`: gera descrições de pull request com base no diff da branch atual.
-- `python-test-generator`: gera testes Python com `pytest`, Django e FastAPI usando os padrões incorporados na própria skill.
-- `python-test-refactor`: refatora, consolida e reorganiza testes Python existentes usando os padrões incorporados na própria skill.
+- `django-tests`: cria, amplia e refatora testes Django/DRF com `pytest`, incluindo a receita de testes por camada.
 - `code-review`: revisa diffs, branches e arquivos alterados com foco em bugs, regressões e riscos.
 - `commit-message`: gera mensagens de commit com base nas alterações atuais.
 - `onboarding`: analisa e resume a estrutura, arquitetura e convenções do projeto.
 - `write-issue`: investiga problemas na codebase e redige issues para Plane.
 - `task-planner`: planeja tasks técnicas, issues, PRs e branches em Markdown.
+- `django-layered-architecture`: estrutura projetos e apps Django/DRF em camadas e decide onde cada código deve morar.
