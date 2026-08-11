@@ -74,8 +74,15 @@ Exemplo:
 ```
 tmp/planning/MON-142-suspensao-de-alertas/
 ├── 2026-08-10-implementation-plan.md
+├── 2026-08-13-desvios.md            escrito na implementação
 └── 2026-08-14-ajustes-pos-review.md
 ```
+
+**O plano é registro do que foi combinado e não se reescreve depois.** Quando a
+implementação precisar divergir, o desvio vira arquivo novo e datado na mesma
+pasta — a skill `python-implementation-workflow` faz isso ao validar. Assim o
+histórico mostra o que foi decidido, o que mudou e por quê, em vez de só o estado
+final.
 
 ## Decomposição por camada
 

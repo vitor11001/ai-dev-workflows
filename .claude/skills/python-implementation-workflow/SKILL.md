@@ -25,19 +25,29 @@ Use esta skill quando o usuário pedir algo como:
 1. Entenda a task e identifique requisitos explícitos, implícitos e ambiguidades.
 2. Leia as instruções locais antes de qualquer coisa: `AGENTS.md`, `CLAUDE.md`,
    `README.md`, `docs/` e o que estiver no diretório em que vai mexer.
-3. **Descubra a versão do Python e o ferramental** em `pyproject.toml`,
+3. **Procure um plano existente** em `tmp/planning/<issue>/`. Se houver, ele é a
+   fonte das decisões já fechadas — leia antes de formar opinião própria sobre a
+   solução.
+4. **Descubra a versão do Python e o ferramental** em `pyproject.toml`,
    `mise.toml`, `.python-version`, `.pre-commit-config.yaml`, `Makefile`,
    `tox.ini`, `noxfile.py` ou `justfile`: formatador, linter, type checker,
    gerenciador de dependência e como rodar os testes.
-4. Mapeie estrutura, pontos de entrada, testes e arquivos relacionados.
-5. Localize código existente que já resolva parte do problema antes de criar
+5. Mapeie estrutura, pontos de entrada, testes e arquivos relacionados.
+6. Localize código existente que já resolva parte do problema antes de criar
    código novo.
-6. Identifique os padrões locais de nomenclatura, organização, imports, erros,
+7. Identifique os padrões locais de nomenclatura, organização, imports, erros,
    logging e testes.
-7. Pergunte apenas quando a ambiguidade puder levar a uma implementação errada ou
+8. Pergunte apenas quando a ambiguidade puder levar a uma implementação errada ou
    arriscada. Nunca pergunte por informação que pode ser descoberta lendo o projeto.
 
 ## Fase 2 — Planejar
+
+**Se existe plano em `tmp/planning/`, ele substitui esta fase.** Não replaneje o
+que já foi decidido: as decisões do plano valem como fechadas, e refazê-las gera
+implementação divergente do que foi combinado. Se você discordar de algo,
+**diga antes de desviar** — nunca implemente diferente em silêncio.
+
+Sem plano prévio:
 
 - Mudanças pequenas e claras: execute direto após mapear o contexto.
 - Alterações restritas a `__init__.py` com intenção clara: execute direto.
@@ -153,6 +163,10 @@ Celery, signals, logs e settings: ver `references/django-conventions.md`.
 - Confirme que a implementação segue a nomenclatura e a arquitetura locais.
 - Confirme que os testes foram criados ou atualizados, e que passaram — lendo a
   saída, não presumindo.
+- **Divergiu do plano?** Registre em `tmp/planning/<issue>/AAAA-MM-DD-desvios.md`:
+  o que o plano dizia, o que foi feito e por quê. Não edite o plano original — ele
+  é o registro do que foi combinado. O desvio é informação nova, e é o que alguém
+  vai querer entender daqui a três meses.
 
 Na resposta final, informe:
 - arquivos principais alterados;
