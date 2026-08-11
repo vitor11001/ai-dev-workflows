@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plano de Implementação Django"
+  short_description: "Destrincha uma issue em plano por camada"
+  default_prompt: "Transforme esta issue num plano de implementação Django decomposto por camada — model, manager, controller, serializer, view, task — em ordem de dependência, com divisão em PRs e testes por camada."

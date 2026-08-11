@@ -21,5 +21,5 @@
 - `commit-message`: gera mensagens de commit com base nas alterações atuais.
 - `onboarding`: analisa e resume a estrutura, arquitetura e convenções do projeto.
 - `write-issue`: investiga problemas na codebase e redige issues para Plane.
-- `task-planner`: planeja tasks técnicas, issues, PRs e branches em Markdown.
+- `django-implementation-plan`: destrincha uma issue em plano de implementação Django por camada, com divisão em PRs.
 - `django-layered-architecture`: estrutura projetos e apps Django/DRF em camadas e decide onde cada código deve morar.

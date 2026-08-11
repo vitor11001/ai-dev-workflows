@@ -19,7 +19,7 @@ O repositório mantém dois conjuntos paralelos de skills com o mesmo conteúdo,
 - `.codex/skills/commit-message`: gera mensagens de commit com base no diff.
 - `.codex/skills/onboarding`: mapeia e resume um projeto rapidamente.
 - `.codex/skills/write-issue`: investiga problemas na codebase e redige issues para Plane.
-- `.codex/skills/task-planner`: planeja tasks técnicas, issues, PRs e branches em Markdown.
+- `.codex/skills/django-implementation-plan`: destrincha uma issue em plano de implementação Django por camada, em ordem de dependência, com divisão em PRs e testes por camada.
 - `.codex/skills/django-layered-architecture`: estrutura projetos e apps Django/DRF em camadas e decide em qual camada cada código deve morar.
 
 ### `.claude/`

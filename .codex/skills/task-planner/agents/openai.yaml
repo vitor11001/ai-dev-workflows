@@ -1,4 +1,0 @@
-interface:
-  display_name: "Task Planner"
-  short_description: "Planeja tasks e PRs em Markdown."
-  default_prompt: "Planeje esta task em Markdown, separando escopo atual, próximos PRs, decisões tomadas, perguntas pendentes, arquivos prováveis, testes e critérios de pronto."
