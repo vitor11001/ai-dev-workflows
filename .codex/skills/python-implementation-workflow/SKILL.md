@@ -3,11 +3,12 @@ name: python-implementation-workflow
 description: executa tarefas de programação Python ponta a ponta como workflow de engenharia senior. use quando o usuário pedir para implementar, alterar, corrigir, refatorar ou evoluir código em projetos Python, incluindo mapeamento inicial, preservação de padrões, implementação, testes e validação.
 ---
 
-# Workflow de Implementação
+# Workflow de Implementação (Python)
 
 ## Objetivo
 
-Executar tarefas de programação de ponta a ponta com mudanças pequenas, consistentes com o projeto e validadas por testes.
+Executar tarefas de programação Python de ponta a ponta com mudanças pequenas,
+consistentes com o projeto e validadas por testes efetivamente executados.
 
 ## Quando usar
 
@@ -19,131 +20,218 @@ Use esta skill quando o usuário pedir algo como:
 - "adicione suporte para..."
 - "faça essa task"
 
-## Procedimento
+## Fase 1 — Mapear
 
-Quando esta skill for usada:
 1. Entenda a task e identifique requisitos explícitos, implícitos e ambiguidades.
-2. Pergunte somente quando a ambiguidade puder levar a uma implementação errada ou arriscada.
-3. Não pergunte por informação que pode ser descoberta lendo o projeto.
-4. Mapeie o projeto antes de editar: leia instruções locais, estrutura, stack, pontos de entrada, testes e arquivos relacionados.
-5. Localize código existente que já resolva parte do problema antes de criar código novo.
-6. Identifique padrões de nomenclatura, organização, classes, funções, métodos, imports, erros, logging e testes.
-7. Implemente a menor mudança coerente com o comportamento pedido.
-8. Crie ou atualize testes para toda mudança comportamental.
-9. Pergunte antes de executar testes ou validações demoradas, salvo quando o usuário já tiver pedido explicitamente.
-10. Reporte claramente o que foi ou não foi executado.
+2. Leia as instruções locais antes de qualquer coisa: `AGENTS.md`, `CLAUDE.md`,
+   `README.md`, `docs/` e o que estiver no diretório em que vai mexer.
+3. **Descubra a versão do Python e o ferramental** em `pyproject.toml`,
+   `mise.toml`, `.python-version`, `.pre-commit-config.yaml`, `Makefile`,
+   `tox.ini`, `noxfile.py` ou `justfile`: formatador, linter, type checker,
+   gerenciador de dependência e como rodar os testes.
+4. Mapeie estrutura, pontos de entrada, testes e arquivos relacionados.
+5. Localize código existente que já resolva parte do problema antes de criar
+   código novo.
+6. Identifique os padrões locais de nomenclatura, organização, imports, erros,
+   logging e testes.
+7. Pergunte apenas quando a ambiguidade puder levar a uma implementação errada ou
+   arriscada. Nunca pergunte por informação que pode ser descoberta lendo o projeto.
+
+## Fase 2 — Planejar
+
+- Mudanças pequenas e claras: execute direto após mapear o contexto.
+- Alterações restritas a `__init__.py` com intenção clara: execute direto.
+- Mudanças médias, grandes, arriscadas ou com múltiplas alternativas plausíveis:
+  apresente um plano curto antes de editar.
+- Se o escopo real parecer maior do que a task indicava, pare e informe o usuário
+  antes de expandir.
+
+## Fase 3 — Implementar
+
+Implemente a menor mudança coerente com o comportamento pedido.
+
+### Regras
+
+- Preserve os padrões do repositório acima de qualquer preferência desta skill.
+- Use a skill `django-layered-architecture` para decidir em qual camada o código
+  novo deve morar em projetos Django/DRF.
+- Não duplique código, helpers, abstrações, constantes, validações ou fluxos já
+  existentes; prefira APIs, services, factories e utilitários locais.
+- Só crie abstração nova diante de duplicação real, complexidade recorrente ou
+  padrão equivalente já presente no projeto.
+- Não faça refatoração ampla sem necessidade direta para a task.
+
+### Versão da linguagem e das bibliotecas
+
+- **Sintaxe que você não reconhece pode ser recurso novo, não erro.** Antes de
+  "corrigir", confirme na versão que o projeto declara.
+- Exemplo real: a partir do Python 3.14 ([PEP 758](https://peps.python.org/pep-0758/)),
+  `except ValueError, TypeError:` sem cláusula `as` dispensa parênteses.
+  Reintroduzi-los quebra o padrão do projeto — e o formatador desfaz na execução
+  seguinte.
+- Não use recurso mais novo que a versão suportada pelo projeto.
+- O mesmo vale para bibliotecas: **confirme que o método, o parâmetro e o
+  comportamento existem na versão instalada** antes de usar. Leia a assinatura no
+  código da dependência ou na doc daquela versão — não escreva de memória.
+- Assinatura que você "lembra" de uma versão diferente falha em runtime ou, pior,
+  é aceita e ignorada.
+
+### Tipagem
+
+- Anote toda função e método novo ou alterado, incluindo o tipo de retorno.
+- Sintaxe moderna: `X | None` em vez de `Optional[X]`, `list[str]` e
+  `dict[str, int]` em vez de `List`/`Dict`, `Self` em vez do nome da própria classe.
+- No lugar de `Any`, escolha o que descreve o contrato: `Protocol` para contrato
+  estrutural, `TypedDict` para dicionário de forma conhecida, generics para
+  container, união explícita para alternativas.
+- `Any` só quando o valor é genuinamente dinâmico — e com comentário dizendo por quê.
+
+### Exceções
+
+- Ao relançar dentro de um `except`, **encadeie**: `raise DomainValidationError(...) from exc`.
+  Sem o `from`, a causa original desaparece do traceback e o diagnóstico se perde.
+- Use a hierarquia de exceção do projeto. Crie exceção nova apenas quando o chamador
+  precisar distinguir aquele caso.
+- Nunca `except:` nu, nem `except Exception` amplo sem relançar ou registrar.
+- A mensagem cita o valor inválido e o formato esperado.
+
+### Segurança
+
+- Segredo vem do ambiente ou do cofre do projeto, **nunca do código** — nem em
+  default, nem em teste, nem em comentário.
+- Nunca `eval`, `exec` ou `pickle.loads` sobre dado que veio de fora.
+- Ao montar consulta, comando ou caminho a partir de entrada externa, parametrize
+  ou valide contra uma lista fechada. Não concatene.
+
+### Transações e efeitos colaterais
+
+- Envolva em `transaction.atomic()` a escrita que precisa ser tudo ou nada.
+- **Nunca dispare task, e-mail, webhook ou qualquer efeito externo de dentro de um
+  `atomic()`.** Use `transaction.on_commit(...)`. O worker pode pegar a task antes
+  do commit, não encontrar o registro e falhar de forma intermitente — o bug mais
+  caro de diagnosticar nessa combinação.
+- `select_for_update()` quando duas execuções concorrentes puderem ler e escrever o
+  mesmo registro. Só funciona dentro de `atomic()`.
+- Efeito colateral idempotente sempre que o fluxo permitir: `on_commit` não garante
+  execução única se o processo cair no meio.
+
+### Convenções
+
+- Código, variáveis, funções, métodos, classes, módulos e arquivos em inglês.
+- Docstrings e comentários em português brasileiro, incluindo nos testes.
+- Uma responsabilidade por função, uma por módulo.
+- Prefira retornos antecipados a `if`s aninhados; evite passar de 2 níveis de
+  indentação.
+- Prefira nomes específicos e fáceis de pesquisar. Antes de usar um nome genérico
+  como `data`, `handler` ou `Manager`, procure com `rg` e escolha algo mais preciso.
+- Funções entre 4 e 20 linhas e arquivos abaixo de 500 linhas, quando a divisão
+  for natural e preservar clareza.
+
+Imports, estrutura de arquivos e classes, docstrings, idiomas modernos e
+dependências: ver `references/python-conventions.md`.
+
+Em projetos Django — controllers com Pydantic, ORM e performance, migrations,
+Celery, signals, logs e settings: ver `references/django-conventions.md`.
+
+## Fase 4 — Testar
+
+- Toda mudança de comportamento cria ou atualiza teste. Sem exceção.
+- Use a skill `django-tests` para criar, ampliar ou refatorar testes em projetos Django.
+- Reutilize factories, fixtures e helpers de teste já existentes.
+- **Execute os testes do que você alterou, sem pedir permissão.** Rodar teste é
+  barato e reversível; entregar sem validar, não.
+- Peça confirmação apenas para comando destrutivo ou de efeito externo: migration
+  contra banco real, deploy, publicação, escrita em serviço de terceiro.
+- Se não for viável testar a mudança, diga o motivo e o risco residual.
+
+## Fase 5 — Validar e reportar
+
+- **Rode o formatador, o linter e o type checker do projeto**, com a configuração
+  dele e pelos alvos que ele expõe. Não formate à mão: o formatador desfaz na
+  execução seguinte e a mudança manual só gera ruído no diff.
+- Revise o diff e remova mudança acidental, código morto, duplicado ou temporário.
+- Confirme que a implementação segue a nomenclatura e a arquitetura locais.
+- Confirme que os testes foram criados ou atualizados, e que passaram — lendo a
+  saída, não presumindo.
+
+Na resposta final, informe:
+- arquivos principais alterados;
+- comportamento implementado;
+- comandos executados e seu resultado real;
+- limitação, risco residual ou validação não executada.
+
+**Nunca afirme que algo foi testado, passou ou funciona sem ter executado o comando
+e lido a saída.** Se um teste falhou, diga que falhou e mostre o erro.
+
+## Atalhos proibidos
+
+Quando algo fica vermelho, a saída é entender — não silenciar.
+
+- **Nunca altere um teste para o código passar.** Se o teste falhou, ou o código
+  está errado, ou o contrato mudou de propósito. No segundo caso, diga ao usuário
+  antes de mexer no teste.
+- Não remova asserção, não afrouxe comparação e não troque valor esperado para
+  fechar a conta.
+- `# type: ignore`, `# noqa` e `skip` são último recurso: use o código específico
+  (`# type: ignore[arg-type]`, `# noqa: E501`) e comente por que a supressão é
+  legítima. Supressão ampla e sem comentário é proibida.
+- Não aumente timeout, não adicione `sleep` e não marque teste como flaky para
+  contornar comportamento que você não entendeu.
+- Se você não consegue resolver sem um desses atalhos, isso é sinal de parar e
+  reportar — ver "Quando parar".
 
 ## Correção de bugs
 
-Quando a task for corrigir um bug, execute estas etapas antes de editar código:
-
-1. Reproduza o problema: confirme o comportamento incorreto com um exemplo concreto, caso de teste ou sequência de passos.
-2. Identifique a causa raiz, não o sintoma: entenda por que o bug acontece antes de propor correção.
-3. Verifique se deveria existir um teste cobrindo esse caso: a ausência de teste frequentemente é parte do bug.
-4. Corrija a causa raiz; evite adicionar condição protetora ou contornar o problema sem entender a origem.
-5. Adicione ou atualize o teste que deveria cobrir o caso que falhou.
-
-## Planejamento
-
-- Para mudanças pequenas e claras, execute diretamente depois de mapear o contexto necessário.
-- Alterações restritas a arquivos `__init__.py` podem ser executadas diretamente quando a intenção estiver clara.
-- Para mudanças médias, grandes, arriscadas ou com múltiplas alternativas plausíveis, apresente um plano curto antes de editar.
-- Se o escopo real parecer maior do que a task inicial indicava, pare e informe o usuário antes de expandir a implementação.
-
-## Regras de implementação
-
-- Preserve os padrões do repositório acima de preferências genéricas.
-- Evite duplicar código, helpers, abstrações, constantes, validações ou fluxos já existentes.
-- Prefira APIs, serviços, factories, fixtures e utilitários locais já usados pelo projeto.
-- Não faça refatorações amplas sem necessidade direta para a task.
-- Não altere contratos públicos, schemas, payloads, nomes ou comportamento existente sem necessidade explícita.
-- Mantenha mudanças pequenas e fáceis de revisar.
-- Adicione docstrings em classes, funções e métodos públicos, complexos ou de domínio criados ou alterados.
-- Para métodos simples, privados ou autoexplicativos, siga o padrão local e evite documentação redundante.
-- Docstrings devem ser claras e úteis: explique intenção, contrato, comportamento esperado, entradas, saídas, efeitos colaterais ou exceções relevantes.
-- Docstrings não devem apenas dizer o óbvio nem repetir linha a linha como o código funciona.
-- Se o projeto tiver um padrão claro de documentação diferente de docstrings, siga o padrão local e preserve a intenção de documentação.
-- Não introduza dependências novas sem verificar se já existe alternativa no projeto e sem justificar.
-- Só crie abstração nova quando houver duplicação real, complexidade recorrente ou padrão equivalente no projeto.
-
-## Convenções de código
-
-- Código, nomes de variáveis, funções, métodos, classes, módulos e arquivos devem estar em inglês.
-- Docstrings e comentários devem estar em português brasileiro.
-- Testes devem ter docstrings claras em português brasileiro.
-- Aplique código limpo: legibilidade, baixo acoplamento, nomes descritivos e responsabilidades claras.
-- Use tipagem robusta e moderna em funções e métodos novos ou alterados.
-- Evite `Any`, tipos vagos e tipos legados como `Dict` quando houver alternativa moderna e específica.
-- Não introduza funções ou métodos sem tipagem, salvo quando o padrão explícito do projeto exigir.
-- Prefira recursos modernos da linguagem e evite padrões legados sem necessidade.
-- Mantenha uma coisa por função e uma responsabilidade por módulo.
-- Evite duplicação de código; extraia lógica compartilhada para função, classe ou módulo quando houver reutilização real.
-- Prefira retornos antecipados a `if`s aninhados.
-- Mensagens de exceção devem incluir o valor inválido e o formato esperado quando isso ajudar o diagnóstico.
-
-### Imports
-
-- Todos os imports ficam no topo do arquivo, após o docstring de módulo quando houver.
-- Nunca coloque imports dentro de funções, métodos ou classes, salvo quando houver importação circular documentada — nesse caso, adicione um comentário curto explicando o ciclo.
-- Antes de introduzir um import inline, verifique se o ciclo é real movendo o import para o topo. Só use import local se o ciclo for confirmado.
-
-### Estrutura de arquivos e classes
-
-- Não crie variáveis globais em arquivos que contêm classes. Constantes e conjuntos usados por uma única classe devem ser atributos privados de classe (`_FORBIDDEN = frozenset(...)`), não variáveis soltas no módulo. Variáveis de módulo são aceitáveis apenas em arquivos puramente funcionais sem classes, ou quando são constantes públicas usadas por múltiplos módulos.
-- Cada arquivo deve conter no máximo uma classe, salvo quando o arquivo definir apenas classes de tipo (`TypedDict`, `dataclass` usado como estrutura de dados, `Enum`).
-- Em arquivos que contêm uma classe, não crie funções ou métodos soltos fora dela; toda lógica deve ser método da classe, método privado ou estar em módulo utilitário separado.
-
-### Heurísticas
-
-- Mantenha funções entre 4 e 20 linhas quando isso preservar clareza.
-- Mantenha arquivos abaixo de 500 linhas quando a divisão por responsabilidade for natural.
-- Evite mais de 2 níveis de indentação; extraia funções ou use retornos antecipados quando melhorar leitura.
-- Prefira nomes específicos e fáceis de pesquisar.
-- Evite nomes genéricos como `data`, `handler` e `Manager`, salvo quando forem convenção clara do framework ou do projeto.
-- Antes de criar nomes genéricos, verifique usos existentes com `rg` e escolha um nome mais preciso quando o termo aparecer em muitos contextos.
+Antes de editar código:
+1. Reproduza o problema com exemplo concreto, caso de teste ou sequência de passos.
+2. Identifique a causa raiz, não o sintoma.
+3. Verifique se deveria existir teste cobrindo o caso — a ausência costuma ser
+   parte do bug.
+4. Corrija a causa raiz; não adicione condição protetora para contornar sem
+   entender a origem.
+5. Adicione o teste de regressão que teria pego a falha.
 
 ## Contratos e compatibilidade
 
-- Ao alterar API, schema, payload, CLI, evento, job, migration, integração externa ou outro contrato público, identifique callers e testes afetados.
-- Pergunte se o usuário quer manter retrocompatibilidade antes de implementar estratégia compatível.
-- Se o usuário não quiser retrocompatibilidade, implemente a mudança direta e ajuste os pontos afetados no projeto.
+- Ao alterar API, schema, payload, CLI, evento, job, migration ou integração
+  externa, identifique callers e testes afetados antes de mudar.
+- Pergunte se o usuário quer retrocompatibilidade antes de implementar estratégia
+  compatível; se não quiser, faça a mudança direta e ajuste os pontos afetados.
+- Destaque toda breaking change na resposta final.
 
 ## Controle de escopo
 
-- Prefira mudanças pequenas e coesas, com uma intenção principal por entrega.
-- Como referência, tente manter a alteração abaixo de 900 linhas modificadas quando isso for viável.
-- Se a task caminhar para mais de 900 linhas modificadas, avalie se a divisão em etapas melhora a revisão.
-- Acima de 1.000 linhas modificadas, proponha divisão ou justifique claramente por que a mudança precisa ficar junta.
-- Mudanças mecânicas, arquivos gerados, lockfiles, snapshots e renomeações amplas devem ser avaliados separadamente do tamanho do código escrito manualmente.
-- Não misture feature, refatoração ampla, formatação, renomeação e atualização de dependências no mesmo trabalho sem necessidade direta.
-- Separe refatoração preparatória de mudança comportamental quando isso facilitar revisão e reduzir risco.
-- Se a task tiver múltiplas intenções independentes, informe o usuário e proponha uma sequência de entregas antes de expandir o escopo.
-- Um bom limite prático é permitir que a revisão entenda motivo, diff e risco em 15 a 30 minutos.
+- Uma intenção principal por entrega. Não misture feature, refatoração ampla,
+  formatação, renomeação e atualização de dependência no mesmo trabalho.
+- O alvo é uma revisão que entenda motivo, diff e risco em 15 a 30 minutos. Se a
+  mudança passar disso, proponha dividir em etapas ou justifique por que precisa
+  ficar junta.
+- Avalie à parte mudança mecânica, arquivo gerado, lockfile e renomeação ampla:
+  inflam o diff sem inflar o risco.
 
-## Testes
+### Código adjacente com problema
 
-- Sempre crie ou atualize testes quando houver mudança de comportamento.
-- Use a skill `python-test-generator` para criar ou ampliar testes Python.
-- Use a skill `python-test-refactor` quando a task exigir reorganizar, consolidar ou modernizar testes existentes.
-- Reutilize factories, fixtures e helpers de teste existentes.
-- Se não for viável testar a mudança, explique o motivo e o risco residual.
-- Pergunte ao usuário se deve executar os testes relevantes antes de rodá-los.
-- Se o usuário preferir executar os testes por conta própria, não rode a suíte e informe quais comandos seriam relevantes.
+Ao encontrar bug, violação de padrão ou dívida **fora do escopo da task**:
 
-## Validação
+- **Reporte, não corrija em silêncio.** Descreva o que viu, onde, e por que é
+  problema — deixe a decisão de corrigir com o usuário.
+- Corrija junto apenas se for pré-requisito real para a task, e diga que fez isso.
+- A exceção é risco imediato — segredo exposto, perda de dado, falha de segurança:
+  avise antes de qualquer outra coisa.
+- Não deixe passar em silêncio só porque está fora do escopo. Achado não relatado
+  é achado perdido.
 
-Antes de entregar:
-1. Revise o diff para remover mudanças acidentais.
-2. Verifique se a implementação segue a nomenclatura e arquitetura locais.
-3. Verifique se não há código morto, duplicado ou temporário.
-4. Confirme que testes foram adicionados ou atualizados quando aplicável.
-5. Pergunte antes de executar testes, lint, typecheck ou build, salvo pedido explícito do usuário.
-6. Não afirme que algo foi testado se o comando não foi executado.
+## Quando parar
 
-## Resposta final
+Pare e reporte ao usuário, em vez de continuar tentando, quando:
 
-Ao finalizar, informe de forma objetiva:
-- arquivos principais alterados;
-- comportamento implementado;
-- testes ou validações executadas;
-- qualquer limitação, risco residual ou validação não executada.
+- a mesma correção falhar 3 vezes seguidas — descreva o que tentou, o que observou
+  e qual hipótese caiu;
+- o teste continuar vermelho e você não souber explicar por quê;
+- a abordagem se revelar errada no meio da implementação — não empilhe remendo
+  sobre a base errada;
+- a task exigir decisão de produto, de contrato ou de prioridade;
+- a mudança exigir credencial, acesso ou informação que você não tem.
+
+Relatar bloqueio cedo custa menos que entregar algo que não funciona. Ao parar,
+diga o que já está feito, o que falta e qual decisão você precisa.
