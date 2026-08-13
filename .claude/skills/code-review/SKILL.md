@@ -25,25 +25,30 @@ necessário não vira achado da branch, mas também não é descartado.
    equivalente. Classificar a atribuição conforme [references/finding-quality.md](references/finding-quality.md).
 5. Derivar invariantes e superfícies de risco a partir do diff. Não usar checklist como
    licença para inventar problemas.
-6. Se houver escrita, transação, lock, job concorrente ou estado lido antes de gravar, ler
+6. Para cada invariante relevante alterada, montar a matriz `promessa -> caminho
+   produtivo -> precondição discriminante -> fronteira observável -> teste`. Se a mudança
+   tocar comportamento testável, cobertura, queries, ordenação, guardas ou contrato, ler
+   [references/test-adequacy.md](references/test-adequacy.md). Nome do teste, cobertura
+   global e suíte verde não provam que o risco foi exercitado.
+7. Se houver escrita, transação, lock, job concorrente ou estado lido antes de gravar, ler
    [references/concurrency-transactions.md](references/concurrency-transactions.md) e montar
    ao menos uma interleaving adversarial.
-7. Se houver API, evento, schema, CLI ou artefato gerado, ler
+8. Se houver API, evento, schema, CLI ou artefato gerado, ler
    [references/api-contract-rollout.md](references/api-contract-rollout.md).
-8. Validar autorização, tenant, inputs externos, efeitos parciais, queries, paginação,
+9. Validar autorização, tenant, inputs externos, efeitos parciais, queries, paginação,
    compatibilidade e consumidores. Usar [references/review-surfaces.md](references/review-surfaces.md)
    para as superfícies tocadas pelo diff.
-9. Se o contexto necessário revelar bug preexistente concreto que não foi agravado pelo
+10. Se o contexto necessário revelar bug preexistente concreto que não foi agravado pelo
    diff, classificá-lo conforme [references/finding-quality.md](references/finding-quality.md)
    sem ampliar a busca para uma auditoria do repositório.
-10. Antes de inferir uma resposta externa a partir de comportamento interno, rastrear o
+11. Antes de inferir uma resposta externa a partir de comportamento interno, rastrear o
    caminho completo até a fronteira: middleware, handlers globais, mapeadores de exceção,
    transação, serializer, retry e adapter aplicáveis.
-11. Rodar os menores testes e gates capazes de provar ou refutar os riscos na mesma
+12. Rodar os menores testes e gates capazes de provar ou refutar os riscos na mesma
    fronteira em que o impacto foi alegado. Não corrigir o código durante o review, salvo
    pedido explícito.
-12. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
-13. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
+13. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
+14. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
     revisão entregue ao usuário.
 
 ## Gate de qualidade do achado
@@ -85,6 +90,11 @@ Hipótese, estilo e dívida de manutenção comum continuam omitidos.
 
 Teste faltante só é achado quando deixa risco relevante sem prova. Caso contrário,
 registrar como lacuna menor ou não listar.
+
+Em `Testes faltantes`, declarar a promessa sem prova, a fronteira que precisa ser
+exercitada e o cenário discriminante esperado. Quando houver sonda de mutação, registrar
+se o teste matou ou deixou sobreviver a alteração causal; erro de sintaxe, import ou setup
+não conta como detecção.
 
 ## Severidade e veredito
 

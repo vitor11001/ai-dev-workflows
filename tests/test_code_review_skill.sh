@@ -11,11 +11,26 @@ required_files=(
   "references/concurrency-transactions.md"
   "references/finding-quality.md"
   "references/review-surfaces.md"
+  "references/test-adequacy.md"
   "scripts/review_context.sh"
 )
 
 for relative_path in "${required_files[@]}"; do
   cmp "$codex_skill/$relative_path" "$claude_skill/$relative_path"
+done
+
+# O par .codex/.claude só fica sincronizado se TODO reference entrar em required_files. Um
+# arquivo fora da lista pode existir de um lado e faltar do outro sem o cmp acima notar —
+# foi assim que o .claude ficou sem `test-adequacy.md`, e a skill do Claude rodou sem a
+# verificação de adequação semântica que a do Codex já tinha.
+for skill_dir in "$codex_skill" "$claude_skill"; do
+  for reference_path in "$skill_dir"/references/*.md; do
+    reference_name="references/$(basename "$reference_path")"
+    printf '%s\n' "${required_files[@]}" | grep -Fqx "$reference_name" || {
+      printf 'reference fora de required_files: %s\n' "$reference_name" >&2
+      exit 1
+    }
+  done
 done
 
 grep -Fq "fronteira em que o impacto foi alegado" "$codex_skill/SKILL.md"
