@@ -42,6 +42,11 @@ grep -Fq 'não altera o veredito' \
   "$codex_skill/references/finding-quality.md"
 grep -Fq 'não iniciar auditoria ampla' \
   "$codex_skill/references/finding-quality.md"
+grep -Fq 'é hipótese, e é' "$codex_skill/SKILL.md"
+grep -Fq 'Afirmação causal escrita é hipótese' \
+  "$codex_skill/references/test-adequacy.md"
+grep -Fq 'Racional invertido' "$codex_skill/references/test-adequacy.md"
+grep -Fq 'Mutante sobrevivente' "$codex_skill/references/test-adequacy.md"
 
 for script_path in \
   "$codex_skill/scripts/review_context.sh" \
