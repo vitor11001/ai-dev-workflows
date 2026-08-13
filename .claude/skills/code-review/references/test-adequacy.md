@@ -23,6 +23,8 @@ Classifique a cobertura como:
 - **Tautológica:** a fixture torna a asserção verdadeira independentemente da regra.
 - **Mutante sobrevivente:** a alteração causal mantém o teste verde.
 - **Mutante morto:** a alteração causal produz a falha funcional esperada.
+- **Racional invertido:** a invariante se sustenta, mas por mecanismo diferente do
+  declarado no código, no teste ou na spec.
 
 ## Sinais de falsa segurança
 
@@ -35,11 +37,36 @@ Classifique a cobertura como:
   removido.
 - O nome do teste, a cobertura de linhas ou o total verde é usado como substituto da
   precondição discriminante.
+- O laço de tentativas aceita um conjunto de exceções (`pytest.raises((A, B))`) onde a
+  regra decide QUAL delas ocorre em cada iteração.
+- A asserção casa um fragmento curto (`"2" in mensagem`) onde a regra determina o valor.
+
+## Afirmação causal escrita é hipótese
+
+Docstring, comentário, mensagem de commit e spec afirmam com frequência um mecanismo:
+"sem esta trava, X acontece", "este índice evita o N+1", "esta guarda impede Y". Cada uma
+dessas frases é uma hipótese testável, e serve de alvo de mutação por si só — não é
+preciso suspeitar de defeito antes.
+
+O teste é direto: neutralize o X citado e verifique se o Y prometido aparece. Dois
+resultados possíveis, e os dois são achados:
+
+- **Mutante sobrevivente:** o teste que cita a regra continua verde, então ele não prova a
+  regra.
+- **Racional invertido:** o comportamento está correto, mas por outro mecanismo — quem
+  sustenta a invariante é outra coisa, não a citada.
+
+O racional invertido merece relato mesmo com o código correto, e não é preferência de
+documentação. Quem mantém o código decide o que pode remover lendo o motivo declarado: se
+o motivo aponta para a peça errada, a próxima mudança remove a peça que de fato sustenta a
+invariante, e o teste que deveria proteger continua verde porque nunca protegeu. Relate
+qual peça foi citada, qual sustenta de fato, e a mutação que separou as duas.
 
 ## Sonda de mutação causal
 
-Use mutação manual somente quando houver hipótese causal específica e um teste-alvo. Ela
-complementa, mas não substitui, uma reprodução na fronteira.
+Use mutação manual quando houver hipótese causal específica e um teste-alvo — inclusive
+quando a hipótese vier de uma afirmação escrita, conforme a seção acima. Ela complementa,
+mas não substitui, uma reprodução na fronteira.
 
 1. Registre o status e o diff originais.
 2. Crie um worktree temporário e isolado, preferencialmente com `mktemp -d` e HEAD
@@ -62,3 +89,7 @@ rebaixe a confiança em vez de simular certeza.
 Uma lacuna relevante deve citar a promessa, o trecho produtivo, o estado que o teste atual
 deixa de montar, a fronteira sem prova e o impacto. Quando houver mutação, informe a
 alteração aplicada e se o teste sobreviveu ou falhou pelo motivo esperado.
+
+Quando várias sondas rodarem, relate o placar — quais invariantes foram confirmadas e
+quais não. A mutação que MATA o mutante é resultado publicável: ela é a evidência de que
+aquele teste protege de fato, e distingue a suíte que vigia da que apenas acompanha.

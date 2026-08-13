@@ -29,7 +29,9 @@ necessário não vira achado da branch, mas também não é descartado.
    produtivo -> precondição discriminante -> fronteira observável -> teste`. Se a mudança
    tocar comportamento testável, cobertura, queries, ordenação, guardas ou contrato, ler
    [references/test-adequacy.md](references/test-adequacy.md). Nome do teste, cobertura
-   global e suíte verde não provam que o risco foi exercitado.
+   global e suíte verde não provam que o risco foi exercitado. Toda afirmação causal do
+   tipo "sem X, acontece Y" — em docstring, comentário, commit ou spec — é hipótese, e é
+   alvo de mutação mesmo sem suspeita prévia de defeito.
 7. Se houver escrita, transação, lock, job concorrente ou estado lido antes de gravar, ler
    [references/concurrency-transactions.md](references/concurrency-transactions.md) e montar
    ao menos uma interleaving adversarial.
