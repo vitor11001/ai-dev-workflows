@@ -43,6 +43,23 @@ Quando a task for corrigir um bug, execute estas etapas antes de editar código:
 4. Corrija a causa raiz; evite adicionar condição protetora ou contornar o problema sem entender a origem.
 5. Adicione ou atualize o teste que deveria cobrir o caso que falhou.
 
+## Branch e plano da issue
+
+Antes de editar qualquer arquivo:
+
+1. Identificar a issue: ID do Plane (ex.: `MONV4-58`) ou identificador local (`LOCAL-<slug>`), conforme a skill `task-planner`.
+2. Se existir `tmp/plans/<identificador>/`, ler os arquivos da pasta em ordem numérica. As decisões do plano prevalecem sobre a issue; divergência entre plano e pedido atual deve ser apontada ao usuário antes de implementar.
+3. Atualizar a branch base do projeto (normalmente `develop`) com `git fetch` e fast-forward.
+   - Se o acesso ao remoto falhar, avançar a base local até o último `origin/<base>` já baixado (`git merge --ff-only origin/<base>`), informar a falha ao usuário e registrar o commit usado.
+   - Se a base avançou desde a análise do plano, conferir com `git diff --stat <commit-do-plano> HEAD -- <arquivos do escopo>` se algo relevante mudou.
+4. Criar a branch a partir da base, no formato `<n>-<identificador>-<descrição-kebab>`, em que `n` é o número do PR na divisão do plano (ex.: `1-MONV4-58-justification-harden-scope-lock-and-requester`). Sem plano, usar `1`.
+5. Confirmar com `git branch --show-current`. Nunca implementar direto na branch base, em `master`/`main` ou em branch de outra tarefa.
+
+Ao terminar a implementação:
+
+- Atualizar a seção "Andamento" do plano com branch, commits, o que foi feito, validações executadas e pendências.
+- Ajuste exigido pelo `make ci`/formatador fora do escopo (ex.: arquivo que veio sem formatação da base) vai na mesma branch, em commit próprio, separado do commit da mudança.
+
 ## Planejamento
 
 - Para mudanças pequenas e claras, execute diretamente depois de mapear o contexto necessário.
@@ -143,6 +160,7 @@ Antes de entregar:
 ## Resposta final
 
 Ao finalizar, informe de forma objetiva:
+- branch criada e commit base usado;
 - arquivos principais alterados;
 - comportamento implementado;
 - testes ou validações executadas;
