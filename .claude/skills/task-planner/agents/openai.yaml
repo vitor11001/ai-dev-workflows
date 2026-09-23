@@ -1,3 +1,3 @@
 display_name: Task Planner
 short_description: Planeja tasks e PRs em Markdown.
-default_prompt: Planeje esta task em Markdown, separando escopo atual, próximos PRs, decisões tomadas, perguntas pendentes, arquivos prováveis, testes e critérios de pronto.
+default_prompt: Planeje esta task em Markdown na pasta tmp/plans/<ID-da-issue>/ com arquivos numerados, registrando o início, a validade da issue, a divisão em PRs, decisões tomadas, perguntas pendentes, arquivos prováveis, testes, critérios de pronto e o andamento.
