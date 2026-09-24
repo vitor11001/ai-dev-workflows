@@ -2,7 +2,10 @@
 
 ## Atribuição obrigatória
 
-Comparar a suspeita com o merge-base antes de comentar:
+Comparar a suspeita com o baseline do escopo antes de comentar: merge-base para branch,
+pai selecionado para commit e HEAD para alterações locais combinadas. Staged e unstaged
+isolados usam, respectivamente, HEAD e índice. A ponta atual da base de destino serve
+para integração, não para atribuir ao PR mudanças posteriores ao merge-base.
 
 | Classificação | Quando usar | Tratamento |
 |---|---|---|

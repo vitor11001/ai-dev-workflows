@@ -48,19 +48,22 @@ Docstring, comentário, mensagem de commit e spec afirmam com frequência um mec
 dessas frases é uma hipótese testável, e serve de alvo de mutação por si só — não é
 preciso suspeitar de defeito antes.
 
-O teste é direto: neutralize o X citado e verifique se o Y prometido aparece. Dois
-resultados possíveis, e os dois são achados:
+Neutralize o X citado e verifique se o Y prometido aparece. Interpretar o resultado
+antes de classificá-lo como achado:
 
-- **Mutante sobrevivente:** o teste que cita a regra continua verde, então ele não prova a
-  regra.
-- **Racional invertido:** o comportamento está correto, mas por outro mecanismo — quem
-  sustenta a invariante é outra coisa, não a citada.
+- **Mutante sobrevivente:** o teste continua verde. Demonstrar uma entrada válida no
+  domínio em que a mutação produz resultado observável incorreto e que o teste deixa
+  passar. Sobrevivência sozinha não prova lacuna relevante.
+- **Mutante equivalente ou redundância legítima:** a alteração preserva o contrato, por
+  equivalência ou por outra proteção válida. Não reportar falha de cobertura apenas
+  porque o teste passou; registrar equivalência demonstrada ou limitação da sonda.
+- **Racional invertido:** outra peça sustenta a invariante. Reportar somente se o motivo
+  declarado estiver comprovadamente errado e induzir risco concreto de manutenção;
+  citar a peça real, a evidência discriminante e o impacto.
 
-O racional invertido merece relato mesmo com o código correto, e não é preferência de
-documentação. Quem mantém o código decide o que pode remover lendo o motivo declarado: se
-o motivo aponta para a peça errada, a próxima mudança remove a peça que de fato sustenta a
-invariante, e o teste que deveria proteger continua verde porque nunca protegeu. Relate
-qual peça foi citada, qual sustenta de fato, e a mutação que separou as duas.
+Só concluir ausência de cobertura quando houver diferença observável esperada e risco
+relevante sem proteção. Se não for possível distinguir equivalência de teste inadequado,
+registrar a incerteza; não converter hipótese em defeito.
 
 ## Sonda de mutação causal
 
@@ -70,8 +73,12 @@ mas não substitui, uma reprodução na fronteira.
 
 1. Registre o status e o diff originais.
 2. Crie um worktree temporário e isolado, preferencialmente com `mktemp -d` e HEAD
-   destacado.
-3. Confirme que o teste-alvo passa sem mutação.
+   destacado na revisão selecionada. Para alterações locais, reproduza o snapshot exato
+   do escopo: índice para staged; arquivos rastreados e novos relevantes para o resultado
+   local combinado. Não copie alterações alheias ao escopo nem modifique o worktree original.
+   Confirme a correspondência do snapshot antes de executar; se não puder reproduzi-lo,
+   registre a limitação e não atribua resultados de HEAD às mudanças locais.
+3. Confirme que o teste-alvo passa sem mutação nessa mesma versão.
 4. Faça uma única alteração mínima que neutralize ou inverta a regra: remover uma chamada,
    inverter duas posições, trocar a ordem de guardas ou retirar um prefetch.
 5. Rode somente o teste-alvo ou o menor conjunto capaz de observar a fronteira.

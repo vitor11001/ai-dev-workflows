@@ -33,8 +33,9 @@ necessário não vira achado da branch, mas também não é descartado.
    reaproveitável, ou tratar exceção devolvendo valor tolerante, ler
    [references/sibling-implementations.md](references/sibling-implementations.md) e
    executar as implementações irmãs com a mesma entrada ruim.
-6. Para cada suspeita, comparar com a base usando `git show <base>:<arquivo>` ou
-   equivalente. Classificar a atribuição conforme [references/finding-quality.md](references/finding-quality.md).
+6. Para cada suspeita, comparar com o baseline do escopo abaixo; em review de branch,
+   usar `git show <merge-base>:<arquivo>`, não a ponta atual da base. Classificar a
+   atribuição conforme [references/finding-quality.md](references/finding-quality.md).
 7. Derivar invariantes e superfícies de risco a partir do diff. Não usar checklist como
    licença para inventar problemas.
 8. Para cada invariante relevante alterada, montar a matriz `promessa -> caminho
@@ -64,6 +65,29 @@ necessário não vira achado da branch, mas também não é descartado.
 15. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
 16. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
     revisão entregue ao usuário.
+
+## Escopo e referências da revisão
+
+Fixar o escopo antes de interpretar os achados:
+
+- **Branch/PR:** diff do merge-base até o HEAD revisado. Usar o merge-base para atribuir
+  introdução ou agravamento; a ponta atual da branch de destino serve para integração.
+- **Commit:** comparar o commit pedido com seu pai. Para merge commit, explicitar o pai
+  escolhido; perguntar se a escolha for ambígua. Não substituir o commit pedido por HEAD.
+- **Alterações locais:** separar staged (`git diff --cached`), unstaged (`git diff`) e
+  arquivos novos (`git ls-files --others --exclude-standard`). Ler o conteúdo dos novos
+  arquivos relevantes. Para o resultado local combinado dos rastreados, usar
+  `git diff HEAD`; o baseline é HEAD. Em review só de staged, ler a versão do índice;
+  em review só de unstaged, comparar a versão de trabalho com o índice.
+- **Arquivos selecionados:** restringir os diffs e o contexto ao recorte solicitado,
+  declarando se a versão é commitada, staged ou a presente no diretório de trabalho.
+
+O helper recebe a base de integração como argumento opcional e também mostra mudanças
+locais. Esses dados são contextos separados: mudanças locais não pertencem automaticamente
+ao PR. Sem base informada, ainda é possível revisar alterações locais.
+Registrar os SHAs de atribuição e integração e a versão efetivamente testada. Testar o
+worktree sujo não prova o comportamento do HEAD isolado; preservar as alterações do usuário
+e reproduzir a versão escolhida em ambiente isolado quando necessário.
 
 ## Gate de qualidade do achado
 
@@ -120,11 +144,21 @@ não conta como detecção.
   ou contrato incompleto → normalmente **Requer ajustes antes de aprovar**.
 - **Baixa:** convenção explícita, manutenção ou cobertura menor → **Aprovável com ajustes
   menores** quando forem os únicos achados.
-- Sem achado relevante → **Aprovável**.
+- Sem achado relevante e com evidência suficiente sobre as partes críticas → **Aprovável**.
+- Parte crítica sem evidência suficiente para concluir → **Inconclusivo**: identificar
+  a limitação, o impacto na análise e a verificação necessária para concluir.
 
-Branch atrás da base com conflito simulado, ou com PR aberto sobre os mesmos arquivos, é
-ajuste antes do merge (**Baixa**): pedir rebase e novo gate contra a base atual. Atraso sem
-conflito nem sobreposição vai só para `Regressões possíveis`.
+Se já houver defeito comprovado que exija bloqueio ou ajustes, manter esse veredito e
+registrar as limitações adicionais. A ausência de execução de testes, isoladamente, não
+torna o review inconclusivo quando a prova causal é suficiente.
+
+Sobreposição de arquivos com outro PR é sinal para investigar, não prova de conflito:
+comparar trechos, contratos e dependências. Não exigir rebase nem alterar o veredito
+somente por sobreposição ou atraso. Conflito simulado com a base atual exige atualização
+da branch (rebase ou merge conforme a política do projeto) e nova validação antes do
+merge. Incompatibilidade demonstrada recebe severidade conforme seu impacto.
+Simulação textual limpa não prova compatibilidade funcional. Registrar riscos de
+integração separadamente de bugs atribuídos ao diff.
 
 Não elevar severidade por gosto. Explicar frequência, alcance, detectabilidade e
 reversibilidade quando influenciarem a classificação. Risco preexistente observado não

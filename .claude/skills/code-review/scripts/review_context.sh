@@ -9,10 +9,18 @@ printf 'branch: %s\n' "$(git branch --show-current)"
 printf 'head: %s\n' "$(git rev-parse --short HEAD)"
 printf 'upstream: %s\n' "$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || printf '<none>')"
 
+# Contexto local separado do diff commitado da branch, mesmo sem base remota.
+printf '\nworktree:\n'
+git status --short
+printf '\nstaged diff (HEAD -> index):\n'
+git --no-pager diff --cached --no-ext-diff --no-textconv
+printf '\nunstaged diff (index -> worktree):\n'
+git --no-pager diff --no-ext-diff --no-textconv
+printf '\nuntracked files (read relevant contents separately):\n'
+git ls-files --others --exclude-standard
+
 if [[ -z "$base_ref" ]]; then
   printf 'base: <not provided; determine from PR, docs or branch chain>\n'
-  printf '\nworktree:\n'
-  git status --short
   exit 0
 fi
 
@@ -21,8 +29,9 @@ merge_base="$(git merge-base "$base_ref" HEAD)"
 
 printf 'base: %s\n' "$base_ref"
 printf 'merge-base: %s\n' "$(git rev-parse --short "$merge_base")"
-printf '\nworktree:\n'
-git status --short
+printf 'attribution base: %s\n' "$merge_base"
+printf 'integration base: %s\n' "$(git rev-parse "${base_ref}^{commit}")"
+printf 'integration simulation scope: committed HEAD only; excludes local changes\n'
 printf '\nexclusive commits:\n'
 git log --oneline "${merge_base}..HEAD"
 printf '\ndiff stat:\n'
@@ -46,8 +55,9 @@ case "$merge_status" in
   *) printf 'merge simulation: <unavailable; git merge-tree --write-tree requires git >= 2.38>\n' ;;
 esac
 
-# PRs abertos que mexem nos mesmos arquivos conflitam com quem entrar depois.
+# Sobreposição sinaliza investigação; não comprova conflito textual ou funcional.
 printf '\nopen PRs touching the same files:\n'
+printf 'shared files alone do not prove a conflict\n'
 if ! command -v gh >/dev/null 2>&1; then
   printf '<gh unavailable>\n'
   exit 0
