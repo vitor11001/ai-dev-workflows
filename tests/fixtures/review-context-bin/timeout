@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# O teste não usa rede nem depende da disponibilidade de GNU timeout.
+shift
+exec bash "$@"
