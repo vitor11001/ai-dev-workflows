@@ -11,6 +11,7 @@ required_files=(
   "references/concurrency-transactions.md"
   "references/finding-quality.md"
   "references/review-surfaces.md"
+  "references/sibling-implementations.md"
   "references/test-adequacy.md"
   "scripts/review_context.sh"
 )
@@ -47,6 +48,11 @@ grep -Fq 'Afirmação causal escrita é hipótese' \
   "$codex_skill/references/test-adequacy.md"
 grep -Fq 'Racional invertido' "$codex_skill/references/test-adequacy.md"
 grep -Fq 'Mutante sobrevivente' "$codex_skill/references/test-adequacy.md"
+grep -Fq 'Ler a issue que o PR resolve' "$codex_skill/SKILL.md"
+grep -Fq 'executar as implementações irmãs com a mesma entrada ruim' "$codex_skill/SKILL.md"
+grep -Fq 'Quem fica sabendo quando o ramo executa?' \
+  "$codex_skill/references/sibling-implementations.md"
+grep -Fq 'gate verde em branch atrasada' "$codex_skill/SKILL.md"
 
 for script_path in \
   "$codex_skill/scripts/review_context.sh" \
@@ -59,6 +65,9 @@ for script_path in \
   grep -Fq "exclusive commits:" <<<"$context"
   grep -Fq "diff stat:" <<<"$context"
   grep -Fq "changed files:" <<<"$context"
+  grep -Fq "behind base:" <<<"$context"
+  grep -Fq "merge simulation:" <<<"$context"
+  grep -Fq "open PRs touching the same files:" <<<"$context"
 done
 
 printf 'code-review skill pairs and context scripts are valid\n'
