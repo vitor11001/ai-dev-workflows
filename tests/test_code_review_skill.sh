@@ -58,16 +58,7 @@ for script_path in \
   "$codex_skill/scripts/review_context.sh" \
   "$claude_skill/scripts/review_context.sh"; do
   bash -n "$script_path"
-  context="$(cd "$repo_dir" && "$script_path" origin/master)"
-  grep -Fq "branch:" <<<"$context"
-  grep -Fq "base: origin/master" <<<"$context"
-  grep -Fq "merge-base:" <<<"$context"
-  grep -Fq "exclusive commits:" <<<"$context"
-  grep -Fq "diff stat:" <<<"$context"
-  grep -Fq "changed files:" <<<"$context"
-  grep -Fq "behind base:" <<<"$context"
-  grep -Fq "merge simulation:" <<<"$context"
-  grep -Fq "open PRs touching the same files:" <<<"$context"
+  bash "$repo_dir/tests/test_review_context.sh" "$script_path"
 done
 
 printf 'code-review skill pairs and context scripts are valid\n'
