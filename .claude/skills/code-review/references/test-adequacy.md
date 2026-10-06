@@ -48,8 +48,12 @@ Docstring, comentário, mensagem de commit e spec afirmam com frequência um mec
 dessas frases é uma hipótese testável, e serve de alvo de mutação por si só — não é
 preciso suspeitar de defeito antes.
 
-Neutralize o X citado e verifique se o Y prometido aparece. Interpretar o resultado
-antes de classificá-lo como achado:
+Neutralize o X citado e verifique se o Y prometido aparece. Quando a frase afirma mais de
+uma coisa ("o controle **e** o last-seen respondem o neutro"), cada parte é uma hipótese
+com mutação própria. Uma guarda anterior pode responder pela outra parte, e o teste
+continua verde com a segunda guarda removida. O mutante que o revisor escolheu por outro
+motivo, como patch silencioso ou referência presa no import, não substitui essas
+mutações. Interpretar o resultado antes de classificá-lo como achado:
 
 - **Mutante sobrevivente:** o teste continua verde. Demonstrar uma entrada válida no
   domínio em que a mutação produz resultado observável incorreto e que o teste deixa
@@ -64,6 +68,27 @@ antes de classificá-lo como achado:
 Só concluir ausência de cobertura quando houver diferença observável esperada e risco
 relevante sem proteção. Se não for possível distinguir equivalência de teste inadequado,
 registrar a incerteza; não converter hipótese em defeito.
+
+## Fakes de biblioteca
+
+Quando a regra depende de como uma biblioteca de terceiros se comporta (que exceção ela
+lança, como converte uma falha em outra, como encadeia `__cause__`/`__context__`, quando
+repete por conta própria, o que devolve em erro), o fake do teste é uma afirmação sobre a
+biblioteca, e precisa de prova como qualquer outra:
+
+1. Ler o caminho na versão instalada (`python -c 'import lib; print(lib.__file__)'`),
+   incluindo retry, handlers de falha e adapters internos.
+2. Rodar uma sonda com o objeto real da biblioteca, com só a fronteira de I/O substituída
+   (conexão, socket, transporte), e registrar o que ele produz de fato.
+3. Comparar com o fake: tipo, mensagem, encadeamento, número de tentativas, efeito
+   colateral. Divergência num atributo que o código de produção lê é lacuna, mesmo com o
+   teste verde.
+4. Mutar o código para ler o atributo vizinho que só o fake preenche (`__context__` →
+   `__cause__`, por exemplo). Se o teste continuar verde, o fake não protege a correção.
+
+Fakes que falham em `pipeline()` ou no construtor não exercitam falhas no meio da
+operação (depois do `WATCH`, entre o envio e a resposta, durante o retry). Cenário de
+"serviço fora" precisa dizer em que ponto ele cai.
 
 ## Sonda de mutação causal
 

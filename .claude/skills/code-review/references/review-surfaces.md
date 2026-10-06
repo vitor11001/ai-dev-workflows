@@ -39,3 +39,23 @@ diferentes, não é estilo: seguir [sibling-implementations.md](sibling-implemen
 
 Classes e métodos em idioma diferente do inglês são achado de convenção mesmo quando o
 comportamento estiver correto; incluir nome atual, local e sugestão objetiva em inglês.
+
+## Reorganização de código
+
+Num PR cujo objetivo declarado é extrair, dividir, mover ou agrupar código, a estrutura
+resultante é o produto, e a régua de "sem impacto de comportamento" não basta. Para cada
+unidade criada ou renomeada (módulo, classe, função pública):
+
+- Listar o que ela contém e comparar com o que o nome promete. Responsabilidade que o
+  nome não anuncia (a flag que liga o recurso dentro de `RedisFailOpen`, a normalização
+  de entrada dentro de um wrapper de I/O) é achado de coesão.
+- Perguntar: quem procura onde X é decidido chega a este nome? Se não, o leitor
+  seguinte vai duplicar X ou alterá-lo no lugar errado.
+- Desconfiar de justificativa técnica no docstring ("fica aqui para evitar import
+  circular") que explica o lugar, mas não o nome: muitas vezes o ciclo se resolve com um
+  módulo próprio e bem nomeado.
+- Equivalência de comportamento (AST, suíte verde, sonda de patch) prova que nada
+  quebrou, não que a divisão ficou boa. Registrar as duas avaliações separadamente.
+
+Severidade normalmente baixa ("convenção explícita ou manutenção"), mas o achado entra
+no relatório: num PR de reorganização, é a avaliação da própria entrega.
