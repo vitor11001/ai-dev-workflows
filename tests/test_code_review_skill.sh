@@ -53,6 +53,12 @@ grep -Fq 'executar as implementações irmãs com a mesma entrada ruim' "$codex_
 grep -Fq 'Quem fica sabendo quando o ramo executa?' \
   "$codex_skill/references/sibling-implementations.md"
 grep -Fq 'gate verde em branch atrasada' "$codex_skill/SKILL.md"
+grep -Fq 'vira uma mutação por parte' "$codex_skill/SKILL.md"
+grep -Fq 'cada parte é uma hipótese' "$codex_skill/references/test-adequacy.md"
+grep -Fq '## Fakes de biblioteca' "$codex_skill/references/test-adequacy.md"
+grep -Fq 'objeto real da biblioteca' "$codex_skill/SKILL.md"
+grep -Fq '## Reorganização de código' "$codex_skill/references/review-surfaces.md"
+grep -Fq '## Revisão final do PR inteiro' "$codex_skill/references/finding-quality.md"
 
 for script_path in \
   "$codex_skill/scripts/review_context.sh" \

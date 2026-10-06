@@ -44,7 +44,9 @@ necessário não vira achado da branch, mas também não é descartado.
    [references/test-adequacy.md](references/test-adequacy.md). Nome do teste, cobertura
    global e suíte verde não provam que o risco foi exercitado. Toda afirmação causal do
    tipo "sem X, acontece Y" — em docstring, comentário, commit ou spec — é hipótese, e é
-   alvo de mutação mesmo sem suspeita prévia de defeito.
+   alvo de mutação mesmo sem suspeita prévia de defeito. Afirmação composta ("A e B
+   respondem o neutro") vira uma mutação por parte: o mutante da hipótese que o revisor
+   escolheu não prova as outras.
 9. Se houver escrita, transação, lock, job concorrente ou estado lido antes de gravar, ler
    [references/concurrency-transactions.md](references/concurrency-transactions.md) e montar
    ao menos uma interleaving adversarial.
@@ -58,11 +60,18 @@ necessário não vira achado da branch, mas também não é descartado.
    sem ampliar a busca para uma auditoria do repositório.
 13. Antes de inferir uma resposta externa a partir de comportamento interno, rastrear o
    caminho completo até a fronteira: middleware, handlers globais, mapeadores de exceção,
-   transação, serializer, retry e adapter aplicáveis.
+   transação, serializer, retry e adapter aplicáveis. Quando a correção depender de como
+   uma biblioteca de terceiros lança, converte, encadeia ou repete exceções, ler o código
+   da versão instalada ou rodar uma sonda com o objeto real da biblioteca. Fake escrito
+   pelo autor só prova a suposição do autor (ver "Fakes de biblioteca" em
+   [references/test-adequacy.md](references/test-adequacy.md)).
 14. Rodar os menores testes e gates capazes de provar ou refutar os riscos na mesma
    fronteira em que o impacto foi alegado. Não corrigir o código durante o review, salvo
    pedido explícito.
 15. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
+    Em PR cujo objetivo declarado é reorganizar código (extrair, dividir, mover,
+    agrupar), nome e coesão das unidades criadas são a entrega, não cosmética: seguir
+    "Reorganização de código" em [references/review-surfaces.md](references/review-surfaces.md).
 16. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
     revisão entregue ao usuário.
 
@@ -184,6 +193,11 @@ Começar pelos achados quando o usuário pedir apenas “review”. Em segunda r
 revalidar o estado atual e registrar quais achados anteriores foram corrigidos, permanecem
 ou deixaram de se aplicar.
 
+Depois de duas ou mais rodadas sobre deltas da mesma branch, fazer uma revisão final do PR
+inteiro (merge-base até HEAD) antes de abrir o PR ou aprovar o merge, sem reaproveitar as
+conclusões das rodadas anteriores. Ver "Revisão final do PR inteiro" em
+[references/finding-quality.md](references/finding-quality.md).
+
 ## Erros comuns
 
 - Revisar apenas linhas adicionadas e ignorar callers ou writers concorrentes.
@@ -202,3 +216,9 @@ ou deixaram de se aplicar.
   sem deixar rastro.
 - Revisar o diff sem conferir a letra da issue e os exemplos concretos que ela cita.
 - Confiar em gate verde rodado contra uma base que já andou.
+- Mutar só a hipótese de risco que o revisor escolheu e dar por provada a afirmação
+  inteira do teste ou da docstring.
+- Aceitar fake de biblioteca como prova de como a biblioteca real se comporta.
+- Tratar nome e coesão como cosmética num PR cujo objetivo é reorganizar código.
+- Revisar só os deltas de cada rodada e nunca o resultado final contra a base.
+- Confirmar só as hipóteses do próprio plano em vez de procurar o que ele não previu.
