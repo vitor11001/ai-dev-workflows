@@ -34,5 +34,8 @@ Reportar nomes fora do idioma exigido, tipos vagos, função grande, duplicaçã
 obsoleto ou fronteira ruim apenas quando houver regra explícita ou impacto de manutenção.
 Preferir risco funcional a preferência pessoal.
 
+Duplicação de regra, a mesma decisão implementada em mais de um lugar com resultados
+diferentes, não é estilo: seguir [sibling-implementations.md](sibling-implementations.md).
+
 Classes e métodos em idioma diferente do inglês são achado de convenção mesmo quando o
 comportamento estiver correto; incluir nome atual, local e sugestão objetiva em inglês.
