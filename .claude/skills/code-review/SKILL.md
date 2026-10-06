@@ -17,41 +17,77 @@ necessário não vira achado da branch, mas também não é descartado.
 1. Ler todas as instruções aplicáveis ao repositório e à área alterada.
 2. Determinar branch, base real, merge-base, commits exclusivos, worktree e escopo. Em
    repositório Git, executar `scripts/review_context.sh <base>` desta skill, resolvendo o
-   caminho a partir do diretório deste `SKILL.md`, quando a base for conhecida.
-3. Ler primeiro o diff; depois, apenas o contexto necessário: callers, models,
+   caminho a partir do diretório deste `SKILL.md`, quando a base for conhecida. Buscar a
+   base no remoto antes (`git fetch`) e ler a defasagem, a simulação de merge e os PRs
+   abertos nos mesmos arquivos que o script imprime: gate verde em branch atrasada vale
+   para a base antiga, não para o resultado do merge.
+3. Ler a issue que o PR resolve: texto original (`tmp/plans/<ID>/1-issue-original.md`,
+   quando existir), corpo do PR ou issue vinculada. Extrair os critérios de aceite, as
+   restrições escritas na letra ("passar pelo caminho X", "não montar o texto à mão") e os
+   exemplos concretos de valor ruim. Conferir cada um contra o diff final; exemplo citado
+   pela issue vira entrada das sondas e testes.
+4. Ler primeiro o diff; depois, apenas o contexto necessário: callers, models,
    serializers, views, controllers, jobs, signals, rotas, schema, cliente gerado, testes e
    decisões relacionadas.
-4. Para cada suspeita, comparar com a base usando `git show <base>:<arquivo>` ou
-   equivalente. Classificar a atribuição conforme [references/finding-quality.md](references/finding-quality.md).
-5. Derivar invariantes e superfícies de risco a partir do diff. Não usar checklist como
+5. Se o diff criar ou alterar helper, tradutor, formatador, validador ou regra
+   reaproveitável, ou tratar exceção devolvendo valor tolerante, ler
+   [references/sibling-implementations.md](references/sibling-implementations.md) e
+   executar as implementações irmãs com a mesma entrada ruim.
+6. Para cada suspeita, comparar com o baseline do escopo abaixo; em review de branch,
+   usar `git show <merge-base>:<arquivo>`, não a ponta atual da base. Classificar a
+   atribuição conforme [references/finding-quality.md](references/finding-quality.md).
+7. Derivar invariantes e superfícies de risco a partir do diff. Não usar checklist como
    licença para inventar problemas.
-6. Para cada invariante relevante alterada, montar a matriz `promessa -> caminho
+8. Para cada invariante relevante alterada, montar a matriz `promessa -> caminho
    produtivo -> precondição discriminante -> fronteira observável -> teste`. Se a mudança
    tocar comportamento testável, cobertura, queries, ordenação, guardas ou contrato, ler
    [references/test-adequacy.md](references/test-adequacy.md). Nome do teste, cobertura
    global e suíte verde não provam que o risco foi exercitado. Toda afirmação causal do
    tipo "sem X, acontece Y" — em docstring, comentário, commit ou spec — é hipótese, e é
    alvo de mutação mesmo sem suspeita prévia de defeito.
-7. Se houver escrita, transação, lock, job concorrente ou estado lido antes de gravar, ler
+9. Se houver escrita, transação, lock, job concorrente ou estado lido antes de gravar, ler
    [references/concurrency-transactions.md](references/concurrency-transactions.md) e montar
    ao menos uma interleaving adversarial.
-8. Se houver API, evento, schema, CLI ou artefato gerado, ler
+10. Se houver API, evento, schema, CLI ou artefato gerado, ler
    [references/api-contract-rollout.md](references/api-contract-rollout.md).
-9. Validar autorização, tenant, inputs externos, efeitos parciais, queries, paginação,
+11. Validar autorização, tenant, inputs externos, efeitos parciais, queries, paginação,
    compatibilidade e consumidores. Usar [references/review-surfaces.md](references/review-surfaces.md)
    para as superfícies tocadas pelo diff.
-10. Se o contexto necessário revelar bug preexistente concreto que não foi agravado pelo
+12. Se o contexto necessário revelar bug preexistente concreto que não foi agravado pelo
    diff, classificá-lo conforme [references/finding-quality.md](references/finding-quality.md)
    sem ampliar a busca para uma auditoria do repositório.
-11. Antes de inferir uma resposta externa a partir de comportamento interno, rastrear o
+13. Antes de inferir uma resposta externa a partir de comportamento interno, rastrear o
    caminho completo até a fronteira: middleware, handlers globais, mapeadores de exceção,
    transação, serializer, retry e adapter aplicáveis.
-12. Rodar os menores testes e gates capazes de provar ou refutar os riscos na mesma
+14. Rodar os menores testes e gates capazes de provar ou refutar os riscos na mesma
    fronteira em que o impacto foi alegado. Não corrigir o código durante o review, salvo
    pedido explícito.
-13. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
-14. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
+15. Aplicar o gate de qualidade de achado abaixo; omitir preferência cosmética sem risco.
+16. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
     revisão entregue ao usuário.
+
+## Escopo e referências da revisão
+
+Fixar o escopo antes de interpretar os achados:
+
+- **Branch/PR:** diff do merge-base até o HEAD revisado. Usar o merge-base para atribuir
+  introdução ou agravamento; a ponta atual da branch de destino serve para integração.
+- **Commit:** comparar o commit pedido com seu pai. Para merge commit, explicitar o pai
+  escolhido; perguntar se a escolha for ambígua. Não substituir o commit pedido por HEAD.
+- **Alterações locais:** separar staged (`git diff --cached`), unstaged (`git diff`) e
+  arquivos novos (`git ls-files --others --exclude-standard`). Ler o conteúdo dos novos
+  arquivos relevantes. Para o resultado local combinado dos rastreados, usar
+  `git diff HEAD`; o baseline é HEAD. Em review só de staged, ler a versão do índice;
+  em review só de unstaged, comparar a versão de trabalho com o índice.
+- **Arquivos selecionados:** restringir os diffs e o contexto ao recorte solicitado,
+  declarando se a versão é commitada, staged ou a presente no diretório de trabalho.
+
+O helper recebe a base de integração como argumento opcional e também mostra mudanças
+locais. Esses dados são contextos separados: mudanças locais não pertencem automaticamente
+ao PR. Sem base informada, ainda é possível revisar alterações locais.
+Registrar os SHAs de atribuição e integração e a versão efetivamente testada. Testar o
+worktree sujo não prova o comportamento do HEAD isolado; preservar as alterações do usuário
+e reproduzir a versão escolhida em ambiente isolado quando necessário.
 
 ## Gate de qualidade do achado
 
@@ -108,7 +144,21 @@ não conta como detecção.
   ou contrato incompleto → normalmente **Requer ajustes antes de aprovar**.
 - **Baixa:** convenção explícita, manutenção ou cobertura menor → **Aprovável com ajustes
   menores** quando forem os únicos achados.
-- Sem achado relevante → **Aprovável**.
+- Sem achado relevante e com evidência suficiente sobre as partes críticas → **Aprovável**.
+- Parte crítica sem evidência suficiente para concluir → **Inconclusivo**: identificar
+  a limitação, o impacto na análise e a verificação necessária para concluir.
+
+Se já houver defeito comprovado que exija bloqueio ou ajustes, manter esse veredito e
+registrar as limitações adicionais. A ausência de execução de testes, isoladamente, não
+torna o review inconclusivo quando a prova causal é suficiente.
+
+Sobreposição de arquivos com outro PR é sinal para investigar, não prova de conflito:
+comparar trechos, contratos e dependências. Não exigir rebase nem alterar o veredito
+somente por sobreposição ou atraso. Conflito simulado com a base atual exige atualização
+da branch (rebase ou merge conforme a política do projeto) e nova validação antes do
+merge. Incompatibilidade demonstrada recebe severidade conforme seu impacto.
+Simulação textual limpa não prova compatibilidade funcional. Registrar riscos de
+integração separadamente de bugs atribuídos ao diff.
 
 Não elevar severidade por gosto. Explicar frequência, alcance, detectabilidade e
 reversibilidade quando influenciarem a classificação. Risco preexistente observado não
@@ -126,7 +176,8 @@ altera o veredito da branch; deixar explícito que precisa de issue ou correçã
 7. `### Banco, transações e performance`
 8. `### Regressões possíveis`
 9. `### Itens sem problema encontrado`
-10. `### Validações executadas`
+10. `### Validações executadas` — incluir a defasagem da base e o resultado da simulação
+    de merge.
 11. `### Veredito` — escolher exatamente uma opção definida acima.
 
 Começar pelos achados quando o usuário pedir apenas “review”. Em segunda revisão,
@@ -145,3 +196,9 @@ ou deixaram de se aplicar.
 - Inferir efeito externo de uma exceção interna sem ler handlers e testar a fronteira.
 - Confundir cobertura alta com cobertura do risco alterado.
 - Listar estilo e duplicação antes de domínio, segurança, contrato e escrita.
+- Aceitar helper novo sem procurar as implementações irmãs da mesma regra, ou tratar a
+  divergência entre elas como estilo.
+- Aceitar fallback que devolve o próprio valor que a issue manda eliminar, ou que executa
+  sem deixar rastro.
+- Revisar o diff sem conferir a letra da issue e os exemplos concretos que ela cita.
+- Confiar em gate verde rodado contra uma base que já andou.

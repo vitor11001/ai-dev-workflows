@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Resposta offline: dois PRs, um sobreposto e um sem relação com o diff.
+printf '17\tother-feature\tshared.txt\n18\tunrelated\tunrelated.txt\n'
