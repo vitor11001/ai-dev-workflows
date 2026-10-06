@@ -24,7 +24,7 @@ Descrever o resultado líquido da branch para o revisor, com o menor texto que p
    1. **Diff final:** define o comportamento que efetivamente ficou na branch.
    2. **Testes, contratos e migrations:** confirmam comportamento observável, compatibilidade e transições de dados.
    3. **Commits:** explicam motivação, decisões e breaking changes, sem substituir o diff final.
-   4. **Plano da issue:** se existir `tmp/plans/<identificador>/`, ler `2-plano-implementacao.md` para saber a posição do PR na divisão (PR n de N), do que ele depende e o que fica para os próximos PRs. O plano dá contexto, mas não substitui o diff: não descrever como feito algo que o diff não mostra.
+   4. **Plano da issue:** se existir `tmp/plans/<identificador>/`, ler `2-plano-implementacao.md` para saber o número do PR na divisão, do que ele depende e o que fica para os próximos PRs. O plano dá contexto, mas não substitui o diff: não descrever como feito algo que o diff não mostra.
    5. **Nome da branch:** serve apenas como pista auxiliar.
 4. Identificar uma mudança principal e agrupar alterações de suporte sob esse resultado. Tratar arquivos gerados, serializers, schemas e testes relacionados como uma única mudança de contrato ou comportamento quando fizerem parte do mesmo efeito.
 5. Escrever o título e a descrição no formato abaixo.
@@ -41,7 +41,7 @@ Descrever o resultado líquido da branch para o revisor, com o menor texto que p
 
 <uma frase explicando o resultado do PR>
 
-**Issue:** <ID confirmado> — PR <n> de <N>. <o que fica para os próximos PRs, em uma frase>
+**Issue:** <ID confirmado> — PR <n>. <o que fica para os próximos PRs, em uma frase>
 
 - <mudança relevante>
 - <mudança relevante>
@@ -59,7 +59,8 @@ Aplicar estas regras:
 - Omitir seções vazias e frases de preenchimento como “Não identificado pelo diff”.
 - Descrever comportamento e impacto para o revisor, não inventariar arquivos.
 - Não criar seção de testes por padrão.
-- Incluir a linha `**Issue:**` sempre que o ID tiver sido confirmado; omitir `PR <n> de <N>` e a frase dos próximos PRs quando não houver plano com divisão.
+- Incluir a linha `**Issue:**` sempre que o ID tiver sido confirmado; omitir `PR <n>` e a frase dos próximos PRs quando não houver plano com divisão.
+- Citar só o número do PR (`PR 2`), nunca o total da divisão (`PR 2 de 10`): a divisão muda ao longo da issue e o total ficaria desatualizado no PR.
 
 ## Verificação
 
