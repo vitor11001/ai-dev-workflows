@@ -69,6 +69,16 @@ Durante a instalação (em ambos os modos e para ambas as ferramentas):
 
 No modo **symlink**, as skills e o arquivo de instruções do projeto apontam para os arquivos deste repositório. Depois da primeira instalação, um `git pull` no repositório já atualiza o conteúdo usado pela ferramenta.
 
+O modo symlink também remove links que apontam para uma skill deste repositório que deixou de existir, e ativa os git hooks de `.githooks/` (`git config core.hooksPath .githooks`, sem sobrescrever um valor já configurado). Os hooks reaplicam a instalação por symlink em modo silencioso:
+
+| Hook | Quando |
+|---|---|
+| `post-merge` | depois de `git merge` ou `git pull` |
+| `post-checkout` | na troca de branch (não no checkout de arquivo) |
+| `post-rewrite` | depois de `git rebase` ou `git pull --rebase` |
+
+Assim, uma skill nova ganha link, uma skill removida perde o link, e as skills acompanham a branch atual. Os hooks só agem na ferramenta já instalada por symlink; instalação por cópia não é alterada. Só são impressas mudanças efetivas (`[claude] link criado: ...`).
+
 ## Uso
 
 Depois da instalação, as skills ficam disponíveis no diretório de skills correspondente à ferramenta (`~/.codex/skills/` ou `~/.claude/skills/`).
