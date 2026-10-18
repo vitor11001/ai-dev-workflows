@@ -1,86 +1,56 @@
 ---
-name: task-planner
-description: Planejamento técnico de tasks, issues, PRs e branches em Markdown. Use quando o usuário quiser transformar uma task/revisão/conversa em plano de implementação, dividir trabalho em PRs, atualizar escopo após review, criar checklist para outra LLM implementar, registrar decisões e perguntas pendentes, ou salvar/atualizar arquivos .md de planejamento.
+name: implementation-plan
+description: planeja a implementação de uma demanda já investigada (o como) em Markdown, em tmp/tasks/<ID>/: mapa de impacto com o efeito da mudança, desenho, testes em ordem de ciclos TDD, perguntas com recomendação, divisão em PRs, premissas e andamento. use quando o usuário quiser transformar uma task, issue, review ou conversa em plano de implementação, dividir trabalho em PRs, atualizar escopo após review, criar checklist para outra LLM implementar ou registrar decisões e perguntas pendentes. se a task ainda não foi investigada, roda a investigate antes; para redigir a issue, use plane-issue.
 ---
 
-# Task Planner
+# Plano de Implementação
 
 ## Objetivo
 
-Planejar tasks técnicas de forma implementável, mantendo escopo, decisões, perguntas, arquivos prováveis, testes e critérios de pronto em Markdown. Priorizar clareza para humanos e para outra LLM executar depois.
+Planejar a implementação de forma executável, a partir da investigação da task: escopo, decisões, perguntas, arquivos prováveis, testes e critérios de pronto em Markdown. Priorizar clareza para humanos e para outra LLM executar depois.
 
 ## Fluxo principal
 
-1. Entender a fonte da demanda: task, issue, review, branch atual, PR futuro, conversa ou arquivo existente.
-2. Resolver o identificador da issue e a pasta do plano (ver "Pasta da issue"). Se a pasta já existir, ler os arquivos dela antes de qualquer coisa e continuar de onde parou.
-3. Na primeira criação do plano, registrar a data e hora de início (ver "Registro de início").
-4. Investigar o repositório quando o plano depender do código atual. Usar `rg`, `git diff`, `git status`, `sed` e testes existentes para ancorar decisões. Em task média ou grande, montar o mapa de impacto antes do desenho (ver "Mapa de impacto"); quando o usuário pedir, apresentar o mapa para revisão antes de seguir.
-5. Quando a demanda vier de uma issue existente, verificar se ela ainda é válida contra o código atual e procurar trabalho paralelo (ver "Validade da issue").
+1. Entender a fonte do pedido (task, issue, review, branch atual, PR futuro ou conversa), localizar a pasta da task (ver "Pasta da task") e ler o `0-sumario.md` e os arquivos dela. Se o plano já existir, continuar de onde parou; pedido vindo de review atualiza o plano existente.
+2. Se não houver `*-investigacao.md`, rodar a skill `investigate` antes. Se houver, conferir a defasagem conforme "Investigação desatualizada" da `investigate`.
+3. Ler `*-issue-original.md` quando existir. Onde o plano divergir da issue, o plano prevalece, e a divergência é registrada em "Decisões já fechadas".
+4. Ajustar a profundidade ao tipo da task (ver "Profundidade por tipo").
+5. Montar o mapa de impacto a partir do mapa do código atual da investigação (ver "Mapa de impacto"); quando o usuário pedir, apresentar o mapa para revisão antes do desenho.
 6. Separar claramente:
    - ajustes da branch/PR atual;
    - próximos PRs/branches;
    - fora de escopo.
-7. Criar ou atualizar os arquivos na pasta da issue, salvo se o usuário indicar outro caminho.
+7. Criar ou atualizar `N-plano-implementacao.md` na pasta da task, salvo se o usuário indicar outro caminho, e registrar a linha no sumário (Status `planejada`).
 8. Registrar decisões tomadas e perguntas pendentes. Quando o usuário responder, atualizar o arquivo e reduzir a lista de pendências.
 9. Quando houver dúvida, propor uma recomendação técnica antes de perguntar. Explicar o motivo em linguagem humana e mostrar um exemplo concreto (ver "Perguntas progressivas").
 10. Antes de encerrar, aplicar "Revisão do plano". Encerrar quando o documento tiver decisões suficientes para implementação sem adivinhação perigosa.
 11. Durante a implementação, manter a seção "Andamento" atualizada a cada PR.
 
-## Pasta da issue
+## Pasta da task
 
-Todo plano mora em `tmp/plans/<identificador>/`, na raiz do repositório em que a issue será implementada.
+- A task mora em `tmp/tasks/<ID>/`; as regras completas (identificador, `LOCAL-<slug>`, arquivos, pasta antiga) estão na skill `investigate`.
+- Encontre os arquivos pelo nome (`*-investigacao.md`, `*-issue-original.md`, `*-plano-implementacao.md`), nunca pelo número; ao criar arquivo, continue a numeração.
+- Ao rodar, registre uma linha no `0-sumario.md` com a data de `date '+%Y-%m-%d %H:%M %Z'`: `| <data> | <skill> | <o que fez> | <arquivo> |`. Atualize o cabeçalho quando Status ou Plane mudarem.
+- Pasta antiga em `tmp/plans/<ID>/`: siga "Pasta antiga em `tmp/plans/`" da skill `investigate`.
 
-### Identificador
-
-- Issue existente no Plane: usar o ID dela, exatamente como no Plane (ex.: `PROJ-123`).
-- Confirmar o ID com o usuário quando ele não tiver sido informado explicitamente ou vier só inferido do nome da branch.
-- Issue que não existe no Plane: usar `LOCAL-<slug>`, com `slug` de 2 a 5 palavras em kebab-case descrevendo o problema (ex.: `LOCAL-escopo-justificativa-alertas`). Antes de criar, conferir com `ls tmp/plans/` que o identificador não está em uso.
-- Quando a issue local ganhar ID no Plane:
-  - renomear a pasta para o ID;
-  - registrar no cabeçalho do plano `Identificador anterior: LOCAL-<slug>`;
-  - branches já criadas mantêm o nome; as próximas usam o ID.
-
-### Arquivos numerados
-
-Todo arquivo da pasta começa com número e hífen, na ordem de leitura: `1-...`, `2-...`, `3-...`. Ao criar um arquivo novo, continuar a numeração existente; nunca renumerar arquivos antigos.
-
-Conjunto padrão:
-
-- `1-issue-original.md`: cópia da issue como estava quando o planejamento começou, para consulta offline. Para issue local, a descrição do problema como o usuário a trouxe.
-- `2-plano-implementacao.md`: análise, decisões, divisão em PRs, pendências e andamento. É o arquivo principal; onde divergir da issue, ele prevalece.
-- `N-exemplo-<assunto>.md`: apoio visual a uma decisão (tabelas de antes/depois, payloads, telas de relatório). Criar quando a pergunta ficar difícil de entender só com texto.
-- Outros apoios seguem a mesma numeração (ex.: `N-pr-<n>-body.md`, criado pela skill `pr-description`).
+Apoios visuais a uma decisão (tabelas de antes/depois, payloads, telas de relatório) vão em `N-exemplo-<assunto>.md`, criados quando a pergunta ficar difícil de entender só com texto.
 
 ### Branches
 
-As branches de implementação seguem `<n>-<identificador>-<descrição-kebab>`, em que `n` é o número do PR na divisão do plano (ex.: `1-PROJ-123-freight-free-shipping-threshold`). Registrar a branch de cada PR na seção "Andamento".
+As branches de implementação seguem `<n>-<identificador>-<descrição-kebab>`, em que `n` é o número do PR na divisão do plano (ex.: `1-PROJ-123-freight-free-shipping-threshold`), criadas a partir da base registrada no plano. Registrar a branch de cada PR na seção "Andamento".
 
-## Registro de início
+## Profundidade por tipo
 
-Na primeira vez que o plano for criado, obter a data e hora reais com `date '+%Y-%m-%d %H:%M %Z'` e gravá-las no cabeçalho de `2-plano-implementacao.md`:
-
-```md
-> Início: 2026-09-23 10:31 -03
-```
-
-- Não estimar a hora de memória; usar o comando.
-- Nunca sobrescrever o início em atualizações posteriores. Datas de decisões e de PRs vão nas seções próprias.
-- Se o plano já existir sem início registrado, perguntar ao usuário ou usar a data de criação do arquivo mais antigo da pasta (`stat`), deixando escrito de onde veio.
-
-## Validade da issue
-
-Quando a demanda for uma issue já escrita (principalmente se estiver aberta há algum tempo):
-
-1. Registrar a base analisada: branch e commit (`git log --oneline -1 origin/<base>`).
-2. Montar uma tabela `Premissa da issue | Estado atual | Onde (arquivo:linha)` para cada afirmação da issue que dependa do código.
-3. Concluir explicitamente: a issue continua válida, está parcialmente resolvida ou está obsoleta.
-4. Registrar problemas encontrados na análise que a issue não menciona, separando o que entra no escopo do que vira issue própria.
-5. Procurar trabalho paralelo ainda não integrado que toque os mesmos arquivos: `git log --oneline --all -- <arquivos>` e `git branch -a --contains <commit>`. Explicar por que importa (regra que o fluxo novo precisaria repetir, conflito provável) e registrar o encaminhamento.
-6. Registrar falsos positivos que uma busca por nome traria (mesmo nome de campo em outro domínio), para ninguém alterá-los por engano.
+| Tipo | Plano |
+|---|---|
+| `hotfix` | curto: causa, menor correção segura, teste de regressão, rollback e um PR; só os blocos de pergunta que bloqueiam |
+| `bug` | causa raiz da investigação, correção, testes de regressão e o que mais a mesma causa afeta |
+| `feature` e `melhoria` | completo: contrato, fluxos, desenho, testes por camada, divisão em PRs e rollout |
+| `débito` | etapas pequenas que mantêm o comportamento, com os testes que protegem cada etapa |
 
 ## Mapa de impacto
 
-Em task média ou grande (mais de um módulo, regra de negócio repetida, dado persistido ou contrato exposto), levantar tudo que a mudança toca antes de propor o desenho. Task pequena e clara (um arquivo, regra óbvia) dispensa o mapa.
+Em task média ou grande, partir do mapa do código atual da investigação e acrescentar a coluna "Efeito da mudança" antes de propor o desenho. Task pequena e clara (um arquivo, regra óbvia) dispensa o mapa.
 
 ```md
 ## Mapa de impacto
@@ -93,11 +63,9 @@ Em task média ou grande (mais de um módulo, regra de negócio repetida, dado p
 | `Order.freight` | migration `0042` | persiste | pedidos antigos mantêm o valor? → pergunta 4 |
 ```
 
-- Papéis: `define`, `duplica`, `chama`, `testa`, `persiste`, `expõe` (API, schema, evento, relatório).
-- Buscar com `rg` pelos termos do conceito (nome do campo, rótulo, constante, mensagem de erro), não só pelo nome da função; a mesma regra costuma estar repetida em serializer, service, model e job.
-- Antes de propor código novo, procurar implementação equivalente ou irmã já existente e registrá-la no mapa.
+- Se o desenho tocar algo que o mapa da investigação não tem, buscar com `rg` pelos termos do conceito e acrescentar a linha, registrando a atualização da investigação no sumário.
+- Antes de propor código novo, conferir as implementações irmãs registradas na investigação.
 - Duplicação encontrada se resolve unificando por padrão; manter as duas cópias só com justificativa de escopo registrada no plano.
-- Incluir artefatos já existentes que a mudança precisa respeitar: dados gravados, migrations aplicadas, consumidores da API e jobs agendados.
 - Todo ponto com efeito `altera`, `duplica` ou com pergunta aberta precisa reaparecer no desenho, em "Testes necessários" ou em "Perguntas pendentes".
 
 ## Estilo do documento
@@ -107,8 +75,7 @@ Usar seções úteis e diretas. Preferir esta estrutura, adaptando ao caso:
 ```md
 # <identificador> — <título>
 
-> Início: <AAAA-MM-DD HH:MM TZ>
-> Texto original: `1-issue-original.md`. Onde este arquivo divergir da issue, este prevalece.
+> Investigação: `N-investigacao.md` · Issue: `N-issue-original.md` (quando existir). Onde este arquivo divergir da issue, este prevalece.
 
 ## Objetivo
 ## Base / Premissas
@@ -226,7 +193,7 @@ Commits: `<sha>` (<resumo>), ...
 Validado: <comandos e resultados reais>. Pendente: <push, PR, review>.
 ```
 
-Registrar só validações que foram executadas, com o resultado obtido. Ciclos TDD ocupam uma linha por comportamento, sem colar saída do `pytest`.
+Registrar só validações que foram executadas, com o resultado obtido. Ciclos TDD ocupam uma linha por comportamento, sem colar saída do `pytest`. O sumário recebe só uma linha por PR iniciado e concluído; o detalhe fica aqui.
 
 ## Registro de decisões
 
@@ -249,17 +216,13 @@ Quando houver uma decisão que o usuário levará a supervisor, registrar como p
 - Pergunta objetiva de produto/arquitetura.
 ```
 
-## Investigação no código
 
-Quando existir repo disponível, investigar antes de planejar detalhes implementáveis:
+## Código no planejamento
 
-- `git status --short --branch` para entender branch e sujeira local;
-- `git diff --stat` e `git diff --name-status` para PR em andamento;
-- `rg` por nomes de models, serializers, views, rotas e testes;
-- ler inteiros os arquivos que o plano vai alterar; nos vizinhos (callers, testes, consumidores), ler só o trecho relevante com `sed`;
-- evitar editar código quando o pedido é apenas planejamento.
-
-Não assumir que endpoint, serializer ou teste existe sem procurar. Se a pergunta for conceitual, pode responder sem varredura ampla, mas planos de implementação devem ser ancorados no código.
+- Ler inteiros os arquivos que o plano vai alterar; nos vizinhos (callers, testes, consumidores), ler só o trecho relevante.
+- `git status --short --branch` para entender branch e sujeira local; para PR em andamento, `git diff --stat` e `git diff --name-status` contra a base.
+- Não assumir que endpoint, serializer ou teste existe sem procurar; o que a investigação não cobriu, buscar com `rg` e acrescentar a ela.
+- Não editar código quando o pedido é apenas planejamento.
 
 ## Regras de escopo
 
@@ -274,7 +237,7 @@ Não assumir que endpoint, serializer ou teste existe sem procurar. Se a pergunt
 Antes de entregar o plano, conferir contra o próprio documento e corrigir o que falhar:
 
 1. Todo ponto do mapa de impacto com efeito `altera`, `duplica` ou pergunta aberta tem passo, teste ou pergunta correspondente?
-2. O desenho contradiz algo registrado no mapa, na validade da issue ou nas decisões fechadas?
+2. O desenho contradiz algo registrado no mapa, na investigação (inclusive a validade da issue) ou nas decisões fechadas?
 3. O plano cria algo que já existe no projeto (helper, validação, endpoint, factory)?
 4. Algum passo depende de fato não verificado que ainda não está em "Premissas não verificadas"?
 
@@ -282,20 +245,13 @@ Se a revisão mudar o desenho, registrar em uma linha o que mudou e por quê.
 
 ## Saída padrão
 
-Ao criar ou atualizar arquivo:
+Entregue em tabelas Markdown, com uma frase de resumo antes e as perguntas pendentes seguintes depois:
 
-- informar o caminho da pasta e dos `.md` criados ou alterados;
-- resumir decisões adicionadas;
-- listar perguntas pendentes seguintes;
-- não colar o documento inteiro salvo, a menos que o usuário peça.
+| Item | Detalhe |
+|---|---|
+| Plano | `tmp/tasks/<ID>/N-plano-implementacao.md` (criado ou atualizado) |
+| Divisão | `<n>` PRs, com o contrato de cada um (não muda, aditivo, breaking) |
+| Decisões adicionadas | uma por linha |
+| Perguntas pendentes | as do próximo bloco, numeradas |
 
-## Nomes de arquivo
-
-Seguir "Pasta da issue": `tmp/plans/<identificador>/<n>-<slug>.md`, por exemplo:
-
-- `tmp/plans/PROJ-123/1-issue-original.md`;
-- `tmp/plans/PROJ-123/2-plano-implementacao.md`;
-- `tmp/plans/PROJ-123/3-exemplo-calculo-frete.md`;
-- `tmp/plans/LOCAL-escopo-justificativa-alertas/2-plano-implementacao.md`.
-
-Usar arquivo solto em `tmp/` só quando o usuário pedir explicitamente.
+Não colar o documento inteiro, a menos que o usuário peça.

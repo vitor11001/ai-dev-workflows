@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plane Issue"
+  short_description: "Redige a issue e publica no Plane quando confirmado"
+  default_prompt: "Use $plane-issue para redigir a issue desta task a partir da investigação e perguntar se deve publicar no Plane."

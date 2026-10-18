@@ -37,8 +37,8 @@ Quando esta skill for usada:
 
 Quando a task for corrigir um bug, execute estas etapas antes de editar código de produção:
 
-1. Reproduza o problema: confirme o comportamento incorreto com um exemplo concreto, caso de teste ou sequência de passos.
-2. Identifique a causa raiz, não o sintoma: entenda por que o bug acontece antes de propor correção.
+1. Reproduza o problema: confirme o comportamento incorreto com um exemplo concreto, caso de teste ou sequência de passos. Se a investigação da task já registra a reprodução, confirme que ela ainda vale em vez de refazer.
+2. Identifique a causa raiz, não o sintoma: entenda por que o bug acontece antes de propor correção. Parta da causa provável da investigação, quando existir, e confirme-a no código.
 3. Escreva o teste que reproduz o bug, rode e confirme que ele falha pelo motivo esperado (RED do "Ciclo TDD"); a ausência desse teste frequentemente é parte do bug.
 4. Corrija a causa raiz; evite adicionar condição protetora ou contornar o problema sem entender a origem.
 5. Rode o teste de novo e confirme que passa.
@@ -59,12 +59,19 @@ Fora do ciclo:
 - Migration, settings e configuração: valide com o comando próprio (ex.: `makemigrations --check`).
 - Exploração de alternativa ou biblioteca: protótipo descartável primeiro; o código definitivo volta ao ciclo.
 
-## Branch e plano da issue
+## Branch e pasta da task
 
-Antes de editar qualquer arquivo:
+### Pasta da task
 
-1. Identificar a issue: ID do Plane (ex.: `PROJ-123`) ou identificador local (`LOCAL-<slug>`), conforme a skill `task-planner`.
-2. Se existir `tmp/plans/<identificador>/`, ler os arquivos da pasta em ordem numérica. As decisões do plano prevalecem sobre a issue; divergência entre plano e pedido atual deve ser apontada ao usuário antes de implementar.
+- A task mora em `tmp/tasks/<ID>/`; as regras completas (identificador, `LOCAL-<slug>`, arquivos, pasta antiga) estão na skill `investigate`.
+- Encontre os arquivos pelo nome (`*-investigacao.md`, `*-issue-original.md`, `*-plano-implementacao.md`), nunca pelo número; ao criar arquivo, continue a numeração.
+- Ao rodar, registre uma linha no `0-sumario.md` com a data de `date '+%Y-%m-%d %H:%M %Z'`: `| <data> | <skill> | <o que fez> | <arquivo> |`. Atualize o cabeçalho quando Status ou Plane mudarem.
+- Pasta antiga em `tmp/plans/<ID>/`: siga "Pasta antiga em `tmp/plans/`" da skill `investigate`.
+
+### Antes de editar qualquer arquivo
+
+1. Identificar a task: ID do Plane (ex.: `PROJ-123`) ou identificador local (`LOCAL-<slug>`). Se a pasta não existir, criar `tmp/tasks/LOCAL-<slug>/` só com o `0-sumario.md` (tipo e Status `em implementação`), para que a task pequena feita direto também tenha histórico; investigação e plano não são obrigatórios.
+2. Ler o `0-sumario.md` e os arquivos da pasta: investigação, issue e plano. As decisões do plano prevalecem sobre a issue; divergência entre plano e pedido atual deve ser apontada ao usuário antes de implementar.
 3. Atualizar a branch base do projeto (normalmente `develop`) com `git fetch` e fast-forward.
    - Se o acesso ao remoto falhar, avançar a base local até o último `origin/<base>` já baixado (`git merge --ff-only origin/<base>`), informar a falha ao usuário e registrar o commit usado.
    - Se a base avançou desde a análise do plano, conferir com `git diff --stat <commit-do-plano> HEAD -- <arquivos do escopo>` se algo relevante mudou.
@@ -73,6 +80,7 @@ Antes de editar qualquer arquivo:
 
 Ao terminar a implementação:
 
+- Registrar no sumário uma linha ao iniciar e outra ao concluir cada PR (Status `em implementação`), com a branch.
 - Atualizar a seção "Andamento" do plano com branch, commits, o que foi feito, validações executadas e pendências.
 - Registrar a evidência de cada ciclo TDD em uma linha, sem colar a saída do `pytest`: `<comportamento>: RED <comando> → falhou (<motivo>); GREEN passou`.
 - Ajuste exigido pelo `make ci`/formatador fora do escopo (ex.: arquivo que veio sem formatação da base) vai na mesma branch, em commit próprio, separado do commit da mudança.
