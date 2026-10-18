@@ -4,9 +4,14 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 TARGET="${1:-}"
+QUIET=false
+
+if [[ "${2:-}" == "--quiet" ]]; then
+  QUIET=true
+fi
 
 if [[ -z "$TARGET" ]]; then
-  echo "Uso: install-symlink.sh <codex|claude>" >&2
+  echo "Uso: install-symlink.sh <codex|claude> [--quiet]" >&2
   exit 1
 fi
 
@@ -37,6 +42,18 @@ PROJECT_INSTRUCTIONS_TARGET="$PROJECT_CONFIG_DIR/$INSTRUCTIONS_FILENAME"
 USER_INSTRUCTIONS_FILE="$USER_BASE/$INSTRUCTIONS_FILENAME"
 INCLUDE_LINE="@${PROJECT_INSTRUCTIONS_TARGET}"
 
+# Mensagens de progresso; suprimidas em --quiet (execução pelos git hooks).
+log() {
+  if [[ "$QUIET" == false ]]; then
+    echo "$@"
+  fi
+}
+
+# Mudanças efetivas (link criado ou removido); impressas mesmo em --quiet.
+report_change() {
+  echo "[$TARGET] $1"
+}
+
 chmod_repo_scripts() {
   while IFS= read -r script_file; do
     chmod +x "$script_file"
@@ -66,6 +83,24 @@ ensure_symlink() {
   fi
 
   ln -s "$source_path" "$target_path"
+  report_change "link criado: $target_path"
+}
+
+# Remove links que apontam para uma skill deste repositório que deixou de existir (skill
+# renomeada, removida ou ausente na branch atual). Links de outra origem nunca são tocados.
+remove_stale_skill_links() {
+  local target_path
+
+  for target_path in "$TARGET_DIR"/*; do
+    if [[ ! -L "$target_path" || -e "$target_path" ]]; then
+      continue
+    fi
+
+    if [[ "$(readlink "$target_path")" == "$SKILLS_DIR/"* ]]; then
+      rm "$target_path"
+      report_change "link quebrado removido: $target_path"
+    fi
+  done
 }
 
 ensure_user_instructions_include() {
@@ -88,7 +123,7 @@ mkdir -p "$PROJECT_CONFIG_DIR"
 
 chmod_repo_scripts
 
-echo "Instalando skills de $TARGET por symlink..."
+log "Instalando skills de $TARGET por symlink..."
 
 for skill_path in "$SKILLS_DIR"/*; do
   if [[ ! -d "$skill_path" ]]; then
@@ -97,24 +132,26 @@ for skill_path in "$SKILLS_DIR"/*; do
 
   skill_name="$(basename "$skill_path")"
   target_path="$TARGET_DIR/$skill_name"
-  echo "- $skill_name"
+  log "- $skill_name"
 
   ensure_symlink "$skill_path" "$target_path" "$skill_name"
 done
 
+remove_stale_skill_links
+
 ensure_symlink "$PROJECT_INSTRUCTIONS_SOURCE" "$PROJECT_INSTRUCTIONS_TARGET" "$INSTRUCTIONS_FILENAME"
 ensure_user_instructions_include
 
-echo "Skills instaladas como symlinks em:"
-echo "$TARGET_DIR"
-echo
-echo "Projeto instalado como symlink em:"
-echo "$PROJECT_INSTRUCTIONS_TARGET"
-echo
-echo "Diretiva garantida em:"
-echo "$USER_INSTRUCTIONS_FILE"
-echo
-echo "A partir de agora, git pull neste repositorio atualiza as skills linkadas."
+log "Skills instaladas como symlinks em:"
+log "$TARGET_DIR"
+log
+log "Projeto instalado como symlink em:"
+log "$PROJECT_INSTRUCTIONS_TARGET"
+log
+log "Diretiva garantida em:"
+log "$USER_INSTRUCTIONS_FILE"
+log
+log "A partir de agora, git pull neste repositorio atualiza as skills linkadas."
 
 if [[ -d "$BACKUP_DIR" ]]; then
   echo "Backup dos itens anteriores em:"

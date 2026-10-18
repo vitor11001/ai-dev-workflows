@@ -16,8 +16,7 @@
 
 - `python-implementation-workflow`: executa tarefas de programação Python ponta a ponta com mapeamento, implementação, testes e validação.
 - `pr-description`: gera descrições de pull request com base no diff da branch atual.
-- `python-test-generator`: gera testes Python com `pytest`, Django e FastAPI usando os padrões incorporados na própria skill.
-- `python-test-refactor`: refatora, consolida e reorganiza testes Python existentes usando os padrões incorporados na própria skill.
+- `python-tests`: cria, refatora e audita testes Python com `pytest`, com referências para Django com DRF e FastAPI com SQLModel async.
 - `code-review`: revisa diffs, branches e arquivos alterados com foco em bugs, regressões e riscos.
 - `commit-message`: gera mensagens de commit com base nas alterações atuais.
 - `onboarding`: analisa e resume a estrutura, arquitetura e convenções do projeto.

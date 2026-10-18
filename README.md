@@ -14,8 +14,7 @@ O repositório mantém dois conjuntos paralelos de skills com o mesmo conteúdo,
 - `.codex/AGENTS.md`: instruções globais para uso do Codex neste repositório.
 - `.codex/skills/python-implementation-workflow`: executa tarefas de programação Python ponta a ponta com mapeamento, implementação, testes e validação.
 - `.codex/skills/pr-description`: gera descrições de Pull Request com base no diff da branch atual. Também gera um título de PR e ignora arquivos de template de PR no contexto coletado.
-- `.codex/skills/python-test-generator`: gera testes Python com padrões de `pytest`, Django e FastAPI incorporados.
-- `.codex/skills/python-test-refactor`: reorganiza e moderniza testes Python existentes com padrões de teste incorporados.
+- `.codex/skills/python-tests`: cria, refatora e audita testes Python com `pytest`, com referências para Django com DRF e FastAPI com SQLModel async.
 - `.codex/skills/code-review`: revisa diffs e identifica riscos técnicos.
 - `.codex/skills/commit-message`: gera mensagens de commit com base no diff.
 - `.codex/skills/onboarding`: mapeia e resume um projeto rapidamente.
@@ -68,6 +67,16 @@ Durante a instalação (em ambos os modos e para ambas as ferramentas):
 - se o arquivo de usuário já existir e precisar ser alterado, um backup `*.bak.<timestamp>` é criado antes.
 
 No modo **symlink**, as skills e o arquivo de instruções do projeto apontam para os arquivos deste repositório. Depois da primeira instalação, um `git pull` no repositório já atualiza o conteúdo usado pela ferramenta.
+
+O modo symlink também remove links que apontam para uma skill deste repositório que deixou de existir, e ativa os git hooks de `.githooks/` (`git config core.hooksPath .githooks`, sem sobrescrever um valor já configurado). Os hooks reaplicam a instalação por symlink em modo silencioso:
+
+| Hook | Quando |
+|---|---|
+| `post-merge` | depois de `git merge` ou `git pull` |
+| `post-checkout` | na troca de branch (não no checkout de arquivo) |
+| `post-rewrite` | depois de `git rebase` ou `git pull --rebase` |
+
+Assim, uma skill nova ganha link, uma skill removida perde o link, e as skills acompanham a branch atual. Os hooks só agem na ferramenta já instalada por symlink; instalação por cópia não é alterada. Só são impressas mudanças efetivas (`[claude] link criado: ...`).
 
 ## Uso
 

@@ -14,7 +14,7 @@ Planejar tasks técnicas de forma implementável, mantendo escopo, decisões, pe
 1. Entender a fonte da demanda: task, issue, review, branch atual, PR futuro, conversa ou arquivo existente.
 2. Resolver o identificador da issue e a pasta do plano (ver "Pasta da issue"). Se a pasta já existir, ler os arquivos dela antes de qualquer coisa e continuar de onde parou.
 3. Na primeira criação do plano, registrar a data e hora de início (ver "Registro de início").
-4. Investigar o repositório quando o plano depender do código atual. Usar `rg`, `git diff`, `git status`, `sed` e testes existentes para ancorar decisões.
+4. Investigar o repositório quando o plano depender do código atual. Usar `rg`, `git diff`, `git status`, `sed` e testes existentes para ancorar decisões. Em task média ou grande, montar o mapa de impacto antes do desenho (ver "Mapa de impacto"); quando o usuário pedir, apresentar o mapa para revisão antes de seguir.
 5. Quando a demanda vier de uma issue existente, verificar se ela ainda é válida contra o código atual e procurar trabalho paralelo (ver "Validade da issue").
 6. Separar claramente:
    - ajustes da branch/PR atual;
@@ -23,7 +23,7 @@ Planejar tasks técnicas de forma implementável, mantendo escopo, decisões, pe
 7. Criar ou atualizar os arquivos na pasta da issue, salvo se o usuário indicar outro caminho.
 8. Registrar decisões tomadas e perguntas pendentes. Quando o usuário responder, atualizar o arquivo e reduzir a lista de pendências.
 9. Quando houver dúvida, propor uma recomendação técnica antes de perguntar. Explicar o motivo em linguagem humana e mostrar um exemplo concreto (ver "Perguntas progressivas").
-10. Encerrar quando o documento tiver decisões suficientes para implementação sem adivinhação perigosa.
+10. Antes de encerrar, aplicar "Revisão do plano". Encerrar quando o documento tiver decisões suficientes para implementação sem adivinhação perigosa.
 11. Durante a implementação, manter a seção "Andamento" atualizada a cada PR.
 
 ## Pasta da issue
@@ -32,7 +32,7 @@ Todo plano mora em `tmp/plans/<identificador>/`, na raiz do repositório em que 
 
 ### Identificador
 
-- Issue existente no Plane: usar o ID dela, exatamente como no Plane (ex.: `MONV4-58`).
+- Issue existente no Plane: usar o ID dela, exatamente como no Plane (ex.: `PROJ-123`).
 - Confirmar o ID com o usuário quando ele não tiver sido informado explicitamente ou vier só inferido do nome da branch.
 - Issue que não existe no Plane: usar `LOCAL-<slug>`, com `slug` de 2 a 5 palavras em kebab-case descrevendo o problema (ex.: `LOCAL-escopo-justificativa-alertas`). Antes de criar, conferir com `ls tmp/plans/` que o identificador não está em uso.
 - Quando a issue local ganhar ID no Plane:
@@ -53,7 +53,7 @@ Conjunto padrão:
 
 ### Branches
 
-As branches de implementação seguem `<n>-<identificador>-<descrição-kebab>`, em que `n` é o número do PR na divisão do plano (ex.: `1-MONV4-58-justification-harden-scope-lock-and-requester`). Registrar a branch de cada PR na seção "Andamento".
+As branches de implementação seguem `<n>-<identificador>-<descrição-kebab>`, em que `n` é o número do PR na divisão do plano (ex.: `1-PROJ-123-freight-free-shipping-threshold`). Registrar a branch de cada PR na seção "Andamento".
 
 ## Registro de início
 
@@ -78,6 +78,28 @@ Quando a demanda for uma issue já escrita (principalmente se estiver aberta há
 5. Procurar trabalho paralelo ainda não integrado que toque os mesmos arquivos: `git log --oneline --all -- <arquivos>` e `git branch -a --contains <commit>`. Explicar por que importa (regra que o fluxo novo precisaria repetir, conflito provável) e registrar o encaminhamento.
 6. Registrar falsos positivos que uma busca por nome traria (mesmo nome de campo em outro domínio), para ninguém alterá-los por engano.
 
+## Mapa de impacto
+
+Em task média ou grande (mais de um módulo, regra de negócio repetida, dado persistido ou contrato exposto), levantar tudo que a mudança toca antes de propor o desenho. Task pequena e clara (um arquivo, regra óbvia) dispensa o mapa.
+
+```md
+## Mapa de impacto
+
+| Ponto | Onde | Papel | Efeito da mudança |
+|---|---|---|---|
+| Regra de frete | `shipping/services/freight.py:42` | define | altera |
+| Regra de frete | `orders/serializers.py:88` | duplica | unificar chamando o service; se ampliar demais o escopo, alterar junto e abrir issue de unificação |
+| `calculate_freight` | `checkout/views.py:120`, `tasks/recalc.py:30` | chama | sem mudança; cobrir com teste |
+| `Order.freight` | migration `0042` | persiste | pedidos antigos mantêm o valor? → pergunta 4 |
+```
+
+- Papéis: `define`, `duplica`, `chama`, `testa`, `persiste`, `expõe` (API, schema, evento, relatório).
+- Buscar com `rg` pelos termos do conceito (nome do campo, rótulo, constante, mensagem de erro), não só pelo nome da função; a mesma regra costuma estar repetida em serializer, service, model e job.
+- Antes de propor código novo, procurar implementação equivalente ou irmã já existente e registrá-la no mapa.
+- Duplicação encontrada se resolve unificando por padrão; manter as duas cópias só com justificativa de escopo registrada no plano.
+- Incluir artefatos já existentes que a mudança precisa respeitar: dados gravados, migrations aplicadas, consumidores da API e jobs agendados.
+- Todo ponto com efeito `altera`, `duplica` ou com pergunta aberta precisa reaparecer no desenho, em "Testes necessários" ou em "Perguntas pendentes".
+
 ## Estilo do documento
 
 Usar seções úteis e diretas. Preferir esta estrutura, adaptando ao caso:
@@ -94,6 +116,7 @@ Usar seções úteis e diretas. Preferir esta estrutura, adaptando ao caso:
 ## Decisões já fechadas
 ## Contrato final
 ## Fluxos esperados
+## Mapa de impacto
 ## Desenho de implementação recomendado
 ## Arquivos prováveis a alterar
 ## Testes necessários
@@ -102,8 +125,21 @@ Usar seções úteis e diretas. Preferir esta estrutura, adaptando ao caso:
 ## Comandos de verificação
 ## Critérios de pronto
 ## Divisão em PRs
+## Premissas não verificadas
 ## Perguntas pendentes
 ## Andamento
+```
+
+Em "Premissas não verificadas", registrar o que o plano supõe sem ter conseguido confirmar no código, com o motivo (ex.: "suponho que o frontend não lê `freight_label`; o repositório do frontend não estava disponível"). Cada premissa vira pergunta pendente ou cuidado importante; nunca fica implícita no desenho.
+
+Em "Testes necessários", listar os comportamentos na ordem dos ciclos TDD da implementação, do caso principal para as bordas. Cada item é um comportamento só, com o arquivo de teste provável; se depender de pergunta pendente, apontar o número dela:
+
+```md
+## Testes necessários
+
+1. Pedido acima de R$ 500 tem frete zero — `tests/unit/shipping/test_freight_calculator.py`.
+2. Pedido de exatamente R$ 500 paga frete — mesmo arquivo (depende da pergunta 3).
+3. Cupom que reduz o total abaixo de R$ 500 volta a cobrar frete — `tests/integration/orders/test_checkout.py`.
 ```
 
 Para documentos de branch atual, detalhar mais:
@@ -185,11 +221,12 @@ Ao implementar cada PR, registrar no fim do plano:
 
 Commits: `<sha>` (<resumo>), ...
 - <o que foi implementado e decisões tomadas durante a implementação>
+- Ciclos TDD: <comportamento>: RED `<comando>` → falhou (<motivo>); GREEN passou.
 
 Validado: <comandos e resultados reais>. Pendente: <push, PR, review>.
 ```
 
-Registrar só validações que foram executadas, com o resultado obtido.
+Registrar só validações que foram executadas, com o resultado obtido. Ciclos TDD ocupam uma linha por comportamento, sem colar saída do `pytest`.
 
 ## Registro de decisões
 
@@ -219,7 +256,7 @@ Quando existir repo disponível, investigar antes de planejar detalhes implement
 - `git status --short --branch` para entender branch e sujeira local;
 - `git diff --stat` e `git diff --name-status` para PR em andamento;
 - `rg` por nomes de models, serializers, views, rotas e testes;
-- ler arquivos relevantes com `sed`;
+- ler inteiros os arquivos que o plano vai alterar; nos vizinhos (callers, testes, consumidores), ler só o trecho relevante com `sed`;
 - evitar editar código quando o pedido é apenas planejamento.
 
 Não assumir que endpoint, serializer ou teste existe sem procurar. Se a pergunta for conceitual, pode responder sem varredura ampla, mas planos de implementação devem ser ancorados no código.
@@ -231,6 +268,17 @@ Não assumir que endpoint, serializer ou teste existe sem procurar. Se a pergunt
 - Se uma review pede remover algo, registrar explicitamente arquivos/rotas/testes a remover.
 - Se o schema/OpenAPI for gerado automaticamente no projeto, documentar que não deve ser editado manualmente.
 - Se endpoints existentes são usados pelo frontend, priorizar compatibilidade; se quebrar contrato for necessário, explicar o motivo em linguagem humana.
+
+## Revisão do plano
+
+Antes de entregar o plano, conferir contra o próprio documento e corrigir o que falhar:
+
+1. Todo ponto do mapa de impacto com efeito `altera`, `duplica` ou pergunta aberta tem passo, teste ou pergunta correspondente?
+2. O desenho contradiz algo registrado no mapa, na validade da issue ou nas decisões fechadas?
+3. O plano cria algo que já existe no projeto (helper, validação, endpoint, factory)?
+4. Algum passo depende de fato não verificado que ainda não está em "Premissas não verificadas"?
+
+Se a revisão mudar o desenho, registrar em uma linha o que mudou e por quê.
 
 ## Saída padrão
 
@@ -245,9 +293,9 @@ Ao criar ou atualizar arquivo:
 
 Seguir "Pasta da issue": `tmp/plans/<identificador>/<n>-<slug>.md`, por exemplo:
 
-- `tmp/plans/MONV4-58/1-issue-original.md`;
-- `tmp/plans/MONV4-58/2-plano-implementacao.md`;
-- `tmp/plans/MONV4-58/3-exemplo-relatorio-revisor.md`;
+- `tmp/plans/PROJ-123/1-issue-original.md`;
+- `tmp/plans/PROJ-123/2-plano-implementacao.md`;
+- `tmp/plans/PROJ-123/3-exemplo-calculo-frete.md`;
 - `tmp/plans/LOCAL-escopo-justificativa-alertas/2-plano-implementacao.md`.
 
 Usar arquivo solto em `tmp/` só quando o usuário pedir explicitamente.
