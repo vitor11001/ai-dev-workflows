@@ -18,8 +18,9 @@ O repositório mantém dois conjuntos paralelos de skills com o mesmo conteúdo,
 - `.codex/skills/code-review`: revisa diffs e identifica riscos técnicos.
 - `.codex/skills/commit-message`: gera mensagens de commit com base no diff.
 - `.codex/skills/onboarding`: mapeia e resume um projeto rapidamente.
-- `.codex/skills/task-planner`: planeja tasks técnicas, issues, PRs e branches em Markdown.
-- `.codex/skills/write-issue`: investiga problemas na codebase e redige issues para Plane.
+- `.codex/skills/investigate`: investiga uma demanda (bug, hotfix, feature, melhoria ou débito) e registra o estado atual do código e o sumário da task em `tmp/tasks/<ID>/`.
+- `.codex/skills/plane-issue`: redige a issue da task a partir da investigação e publica no Plane quando confirmado (script `scripts/plane.py`).
+- `.codex/skills/implementation-plan`: planeja a implementação da task: mapa de impacto, testes, divisão em PRs e andamento.
 
 ### `.claude/`
 
@@ -91,3 +92,26 @@ Quando você pedir uma descrição de PR, o fluxo esperado deste repositório é
 3. Gerar um título objetivo com base no diff.
 4. Gerar uma descrição objetiva com base no diff.
 5. Escrever o resultado em `pr_body.md`, com o título separado da descrição no mesmo arquivo.
+
+## Fluxo de uma task
+
+Cada demanda (bug, hotfix, feature, melhoria ou débito) mora em `tmp/tasks/<ID>/` no repositório em que será resolvida, com `<ID>` igual ao ID do Plane ou `LOCAL-<slug>` enquanto não houver issue:
+
+```
+investigate ─► plane-issue (opcional) ─► implementation-plan ─► python-implementation-workflow ─► code-review ─► pr-description
+```
+
+- `0-sumario.md` registra tipo, status, situação no Plane e uma linha datada por skill executada.
+- `investigate` é a base: `plane-issue` e `implementation-plan` a executam antes quando a investigação ainda não existe.
+- `plane-issue` sempre pergunta antes de publicar; muita correção não vai para o Plane.
+
+### Configuração do Plane
+
+Para publicar e buscar issues, crie `~/.config/ai-dev-workflows/plane.env` (com `chmod 600`):
+
+```bash
+PLANE_WORKSPACE=<slug-do-workspace>
+PLANE_API_TOKEN_FILE=<caminho do arquivo com o token>
+```
+
+O script `plane-issue/scripts/plane.py` lê o token desse arquivo e o envia só no header da API (Plane Cloud). `python3 -I .claude/skills/plane-issue/scripts/plane.py check` valida a configuração e lista os projetos.
