@@ -12,8 +12,8 @@ Descrever o resultado líquido da branch para o revisor, com o menor texto que p
 ## Procedimento
 
 0. **Confirmar a issue antes de qualquer outra coisa.**
-   - Deduzir o identificador pelo nome da branch (`<n>-<identificador>-<descrição>`, ex.: `1-MONV4-58-...` → `MONV4-58`, PR 1) ou pela pasta `tmp/plans/<identificador>/`.
-   - Perguntar ao usuário, logo no início, se o ID do Plane está correto, mostrando de onde ele veio (ex.: "A branch indica a issue MONV4-58, PR 1. Confirma que é essa no Plane?").
+   - Deduzir o identificador pelo nome da branch (`<n>-<identificador>-<descrição>`, ex.: `1-PROJ-123-...` → `PROJ-123`, PR 1) ou pela pasta `tmp/plans/<identificador>/`.
+   - Perguntar ao usuário, logo no início, se o ID do Plane está correto, mostrando de onde ele veio (ex.: "A branch indica a issue PROJ-123, PR 1. Confirma que é essa no Plane?").
    - Se não for possível deduzir, ou o identificador for local (`LOCAL-<slug>`), perguntar se a issue existe no Plane e qual é o ID.
    - Só seguir depois da confirmação. Se o usuário corrigir o ID, usar o corrigido em todo o texto.
 1. Trabalhar no repositório atual.
