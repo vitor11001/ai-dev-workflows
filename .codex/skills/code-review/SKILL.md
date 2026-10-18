@@ -45,7 +45,7 @@ necessário não vira achado da branch, mas também não é descartado.
    global e suíte verde não provam que o risco foi exercitado. Toda afirmação causal do
    tipo "sem X, acontece Y" — em docstring, comentário, commit ou spec — é hipótese, e é
    alvo de mutação mesmo sem suspeita prévia de defeito. Afirmação composta ("A e B
-   respondem o neutro") vira uma mutação por parte: o mutante da hipótese que o revisor
+   retornam o padrão") vira uma mutação por parte: o mutante da hipótese que o revisor
    escolheu não prova as outras.
 9. Se houver escrita, transação, lock, job concorrente ou estado lido antes de gravar, ler
    [references/concurrency-transactions.md](references/concurrency-transactions.md) e montar

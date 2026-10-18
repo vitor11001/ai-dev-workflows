@@ -49,7 +49,7 @@ dessas frases é uma hipótese testável, e serve de alvo de mutação por si s�
 preciso suspeitar de defeito antes.
 
 Neutralize o X citado e verifique se o Y prometido aparece. Quando a frase afirma mais de
-uma coisa ("o controle **e** o last-seen respondem o neutro"), cada parte é uma hipótese
+uma coisa ("o cache **e** o fallback retornam o valor padrão"), cada parte é uma hipótese
 com mutação própria. Uma guarda anterior pode responder pela outra parte, e o teste
 continua verde com a segunda guarda removida. O mutante que o revisor escolheu por outro
 motivo, como patch silencioso ou referência presa no import, não substitui essas

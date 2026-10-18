@@ -47,7 +47,7 @@ resultante é o produto, e a régua de "sem impacto de comportamento" não basta
 unidade criada ou renomeada (módulo, classe, função pública):
 
 - Listar o que ela contém e comparar com o que o nome promete. Responsabilidade que o
-  nome não anuncia (a flag que liga o recurso dentro de `RedisFailOpen`, a normalização
+  nome não anuncia (a flag que liga o recurso dentro de `CacheFallback`, a normalização
   de entrada dentro de um wrapper de I/O) é achado de coesão.
 - Perguntar: quem procura onde X é decidido chega a este nome? Se não, o leitor
   seguinte vai duplicar X ou alterá-lo no lugar errado.
