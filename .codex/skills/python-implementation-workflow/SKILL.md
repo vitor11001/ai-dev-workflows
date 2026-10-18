@@ -180,9 +180,27 @@ Antes de entregar:
 
 ## Resposta final
 
-Ao finalizar, informe de forma objetiva:
-- branch criada e commit base usado;
-- arquivos principais alterados;
-- comportamento implementado;
-- testes ou validações executadas;
-- qualquer limitação, risco residual ou validação não executada.
+Entregue a resposta final em tabelas Markdown. Texto fora das tabelas só para uma frase de resumo no início e a recomendação de próximo passo no fim.
+
+**Entrega** — uma linha por item; omitir a que não se aplicar:
+
+| Item | Detalhe |
+|---|---|
+| Branch | `1-PROJ-123-freight-free-shipping-threshold`, criada de `develop` @ `a1b2c3d` |
+| Comportamento | o que passou a funcionar, em uma frase |
+| Limitações e riscos | risco residual, decisão pendente ou validação não executada |
+
+**Arquivos alterados** — os principais, sem listar arquivos gerados:
+
+| Arquivo | Mudança |
+|---|---|
+| `shipping/services/freight.py` | frete zero acima de R$ 500 |
+
+**Verificação** — um comando por linha, com o resultado real; ciclos TDD entram com RED e GREEN:
+
+| Comando | Resultado |
+|---|---|
+| `pytest tests/unit/shipping/test_freight_calculator.py` | RED: falhou (frete 25.00 ≠ 0); GREEN: 3 passaram |
+| `make ci` | não executado; perguntar antes de rodar |
+
+Quando a skill `python-tests` também tiver sido usada, não repita as tabelas dela: os testes entram na tabela de verificação.
