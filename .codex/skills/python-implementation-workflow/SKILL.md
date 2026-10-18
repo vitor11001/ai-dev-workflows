@@ -157,8 +157,7 @@ Ao terminar a implementação:
 ## Testes
 
 - Sempre crie ou atualize testes quando houver mudança de comportamento.
-- Use a skill `python-test-generator` para criar ou ampliar testes Python.
-- Use a skill `python-test-refactor` quando a task exigir reorganizar, consolidar ou modernizar testes existentes.
+- Use a skill `python-tests` para escrever testes: modo criar para criar ou ampliar, modo refatorar quando a task exigir reorganizar, consolidar ou modernizar testes existentes.
 - Reutilize factories, fixtures e helpers de teste existentes.
 - Se não for viável testar a mudança, explique o motivo e o risco residual.
 
