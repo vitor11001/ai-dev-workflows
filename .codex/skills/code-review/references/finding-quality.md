@@ -84,3 +84,22 @@ Não copiar o relatório anterior. Para cada achado antigo:
 - repetir a reprodução ou prova;
 - marcar como corrigido, ainda presente ou não aplicável;
 - procurar regressões introduzidas pelo ajuste.
+
+## Revisão final do PR inteiro
+
+Rodadas sucessivas sobre deltas pequenos acumulam pontos cegos: cada rodada confia na
+anterior, e as hipóteses do plano viram as únicas verificadas. Quando a mesma branch
+passou por duas ou mais revisões de delta, fazer uma revisão do PR inteiro antes de abri-lo
+ou de aprovar o merge:
+
+- escopo merge-base até HEAD, com o fluxo obrigatório completo;
+- não ler os relatórios anteriores antes de terminar a análise, e só depois usá-los como
+  checklist do que foi achado e corrigido;
+- partir das promessas do PR final (corpo, docstrings, nomes das unidades novas), não do
+  plano;
+- para cada risco que o plano previu, procurar também o caso vizinho que ele não previu:
+  outra origem da mesma exceção, outra guarda que responde antes, outro leitor do mesmo
+  dado.
+
+Quando o mesmo agente planejou, implementou e revisou, declarar isso no relatório: a
+revisão confirma o raciocínio do autor e é mais fraca contra os erros desse raciocínio.
