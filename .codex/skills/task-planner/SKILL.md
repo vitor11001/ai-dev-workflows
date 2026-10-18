@@ -32,7 +32,7 @@ Todo plano mora em `tmp/plans/<identificador>/`, na raiz do repositório em que 
 
 ### Identificador
 
-- Issue existente no Plane: usar o ID dela, exatamente como no Plane (ex.: `MONV4-58`).
+- Issue existente no Plane: usar o ID dela, exatamente como no Plane (ex.: `PROJ-123`).
 - Confirmar o ID com o usuário quando ele não tiver sido informado explicitamente ou vier só inferido do nome da branch.
 - Issue que não existe no Plane: usar `LOCAL-<slug>`, com `slug` de 2 a 5 palavras em kebab-case descrevendo o problema (ex.: `LOCAL-escopo-justificativa-alertas`). Antes de criar, conferir com `ls tmp/plans/` que o identificador não está em uso.
 - Quando a issue local ganhar ID no Plane:
@@ -53,7 +53,7 @@ Conjunto padrão:
 
 ### Branches
 
-As branches de implementação seguem `<n>-<identificador>-<descrição-kebab>`, em que `n` é o número do PR na divisão do plano (ex.: `1-MONV4-58-justification-harden-scope-lock-and-requester`). Registrar a branch de cada PR na seção "Andamento".
+As branches de implementação seguem `<n>-<identificador>-<descrição-kebab>`, em que `n` é o número do PR na divisão do plano (ex.: `1-PROJ-123-freight-free-shipping-threshold`). Registrar a branch de cada PR na seção "Andamento".
 
 ## Registro de início
 
@@ -245,9 +245,9 @@ Ao criar ou atualizar arquivo:
 
 Seguir "Pasta da issue": `tmp/plans/<identificador>/<n>-<slug>.md`, por exemplo:
 
-- `tmp/plans/MONV4-58/1-issue-original.md`;
-- `tmp/plans/MONV4-58/2-plano-implementacao.md`;
-- `tmp/plans/MONV4-58/3-exemplo-relatorio-revisor.md`;
+- `tmp/plans/PROJ-123/1-issue-original.md`;
+- `tmp/plans/PROJ-123/2-plano-implementacao.md`;
+- `tmp/plans/PROJ-123/3-exemplo-calculo-frete.md`;
 - `tmp/plans/LOCAL-escopo-justificativa-alertas/2-plano-implementacao.md`.
 
 Usar arquivo solto em `tmp/` só quando o usuário pedir explicitamente.

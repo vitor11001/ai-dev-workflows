@@ -47,12 +47,12 @@ Quando a task for corrigir um bug, execute estas etapas antes de editar código:
 
 Antes de editar qualquer arquivo:
 
-1. Identificar a issue: ID do Plane (ex.: `MONV4-58`) ou identificador local (`LOCAL-<slug>`), conforme a skill `task-planner`.
+1. Identificar a issue: ID do Plane (ex.: `PROJ-123`) ou identificador local (`LOCAL-<slug>`), conforme a skill `task-planner`.
 2. Se existir `tmp/plans/<identificador>/`, ler os arquivos da pasta em ordem numérica. As decisões do plano prevalecem sobre a issue; divergência entre plano e pedido atual deve ser apontada ao usuário antes de implementar.
 3. Atualizar a branch base do projeto (normalmente `develop`) com `git fetch` e fast-forward.
    - Se o acesso ao remoto falhar, avançar a base local até o último `origin/<base>` já baixado (`git merge --ff-only origin/<base>`), informar a falha ao usuário e registrar o commit usado.
    - Se a base avançou desde a análise do plano, conferir com `git diff --stat <commit-do-plano> HEAD -- <arquivos do escopo>` se algo relevante mudou.
-4. Criar a branch a partir da base, no formato `<n>-<identificador>-<descrição-kebab>`, em que `n` é o número do PR na divisão do plano (ex.: `1-MONV4-58-justification-harden-scope-lock-and-requester`). Sem plano, usar `1`.
+4. Criar a branch a partir da base, no formato `<n>-<identificador>-<descrição-kebab>`, em que `n` é o número do PR na divisão do plano (ex.: `1-PROJ-123-freight-free-shipping-threshold`). Sem plano, usar `1`.
 5. Confirmar com `git branch --show-current`. Nunca implementar direto na branch base, em `master`/`main` ou em branch de outra tarefa.
 
 Ao terminar a implementação:
