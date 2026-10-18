@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Argumentos: <HEAD anterior> <HEAD novo> <1 = troca de branch | 0 = checkout de arquivo>.
+# Só sincroniza na troca de branch; restaurar arquivo não muda o conjunto de skills.
+if [[ "${3:-0}" == "1" ]]; then
+  exec "$(git rev-parse --show-toplevel)/scripts/sync-skill-links.sh"
+fi

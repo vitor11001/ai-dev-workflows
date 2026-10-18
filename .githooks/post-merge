@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Depois de `git merge` ou `git pull` (merge): cria links de skills novas e remove os quebrados.
+exec "$(git rev-parse --show-toplevel)/scripts/sync-skill-links.sh"
