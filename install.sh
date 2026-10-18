@@ -14,9 +14,29 @@ run_copy() {
   "$REPO_DIR/scripts/install-copy.sh" "$target"
 }
 
+# Ativa os hooks de .githooks/, que mantêm os symlinks em dia após pull, checkout e rebase.
+# Não sobrescreve um core.hooksPath já configurado com outro valor.
+enable_git_hooks() {
+  local current_hooks_path
+
+  if ! git -C "$REPO_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+    return
+  fi
+
+  current_hooks_path="$(git -C "$REPO_DIR" config --get core.hooksPath || true)"
+
+  if [[ -z "$current_hooks_path" ]]; then
+    git -C "$REPO_DIR" config core.hooksPath .githooks
+    echo "Git hooks ativados: links de skills novas, removidas ou de outra branch sincronizam sozinhos."
+  elif [[ "$current_hooks_path" != ".githooks" ]]; then
+    echo "core.hooksPath ja aponta para $current_hooks_path; hooks de .githooks/ nao foram ativados." >&2
+  fi
+}
+
 run_symlink() {
   local target="$1"
   "$REPO_DIR/scripts/install-symlink.sh" "$target"
+  enable_git_hooks
 }
 
 run_mode() {
