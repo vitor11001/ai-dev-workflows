@@ -31,7 +31,7 @@ Quando esta skill for usada:
 4. Converta padrões legados para `pytest` funcional quando isso reduzir complexidade.
 5. Consolide testes do mesmo módulo no arquivo que segue o espelhamento correto.
 6. Remova sobras locais como `__pycache__`, arquivos temporários e diretórios vazios quando fizer parte do trabalho solicitado.
-7. Pergunte antes de executar `pytest` ou validações demoradas, salvo pedido explícito do usuário.
+7. Execute testes conforme "Execução".
 
 ## Princípios
 
@@ -134,7 +134,9 @@ Use esta lista como referência para preservar ou reorganizar cobertura existent
 
 ## Execução
 
-- Pergunte ao usuário antes de rodar `pytest`, lint, typecheck ou validações demoradas.
+- Rode sem perguntar os testes focados: arquivos de teste reorganizados, antes e depois da refatoração (`pytest <arquivo>` ou `-k <nome>`).
+- Pergunte antes de rodar a suíte completa, `make ci`, lint ou typecheck do projeto inteiro e build.
+- Se o teste focado falhar por infraestrutura (banco, Docker, variável de ambiente), pare e informe; não suba serviços por conta própria.
 - Se o usuário preferir executar os testes, informe os comandos relevantes em vez de rodá-los.
 - Não afirme que algo foi testado se o comando não foi executado.
 
@@ -149,4 +151,4 @@ Antes de entregar, confirme:
 6. A refatoração não alterou comportamento de produção?
 7. Duplicações foram removidas apenas quando os cenários eram equivalentes?
 8. Não foi criada fixture global ou factory duplicada desnecessária?
-9. O usuário foi consultado antes de executar testes ou validações demoradas?
+9. Os testes focados passaram antes e depois, e o usuário foi consultado antes de validações amplas?

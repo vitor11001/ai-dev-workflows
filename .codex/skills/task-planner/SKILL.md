@@ -106,6 +106,16 @@ Usar seções úteis e diretas. Preferir esta estrutura, adaptando ao caso:
 ## Andamento
 ```
 
+Em "Testes necessários", listar os comportamentos na ordem dos ciclos TDD da implementação, do caso principal para as bordas. Cada item é um comportamento só, com o arquivo de teste provável; se depender de pergunta pendente, apontar o número dela:
+
+```md
+## Testes necessários
+
+1. Pedido acima de R$ 500 tem frete zero — `tests/unit/shipping/test_freight_calculator.py`.
+2. Pedido de exatamente R$ 500 paga frete — mesmo arquivo (depende da pergunta 3).
+3. Cupom que reduz o total abaixo de R$ 500 volta a cobrar frete — `tests/integration/orders/test_checkout.py`.
+```
+
 Para documentos de branch atual, detalhar mais:
 
 - o que deve ser removido;
@@ -185,11 +195,12 @@ Ao implementar cada PR, registrar no fim do plano:
 
 Commits: `<sha>` (<resumo>), ...
 - <o que foi implementado e decisões tomadas durante a implementação>
+- Ciclos TDD: <comportamento>: RED `<comando>` → falhou (<motivo>); GREEN passou.
 
 Validado: <comandos e resultados reais>. Pendente: <push, PR, review>.
 ```
 
-Registrar só validações que foram executadas, com o resultado obtido.
+Registrar só validações que foram executadas, com o resultado obtido. Ciclos TDD ocupam uma linha por comportamento, sem colar saída do `pytest`.
 
 ## Registro de decisões
 
