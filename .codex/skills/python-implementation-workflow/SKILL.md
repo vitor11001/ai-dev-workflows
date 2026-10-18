@@ -29,19 +29,35 @@ Quando esta skill for usada:
 5. Localize código existente que já resolva parte do problema antes de criar código novo.
 6. Identifique padrões de nomenclatura, organização, classes, funções, métodos, imports, erros, logging e testes.
 7. Implemente a menor mudança coerente com o comportamento pedido.
-8. Crie ou atualize testes para toda mudança comportamental.
-9. Pergunte antes de executar testes ou validações demoradas, salvo quando o usuário já tiver pedido explicitamente.
+8. Crie ou atualize testes para toda mudança comportamental; em bug ou regra de negócio nova, siga o "Ciclo TDD".
+9. Execute testes conforme "Execução de testes".
 10. Reporte claramente o que foi ou não foi executado.
 
 ## Correção de bugs
 
-Quando a task for corrigir um bug, execute estas etapas antes de editar código:
+Quando a task for corrigir um bug, execute estas etapas antes de editar código de produção:
 
 1. Reproduza o problema: confirme o comportamento incorreto com um exemplo concreto, caso de teste ou sequência de passos.
 2. Identifique a causa raiz, não o sintoma: entenda por que o bug acontece antes de propor correção.
-3. Verifique se deveria existir um teste cobrindo esse caso: a ausência de teste frequentemente é parte do bug.
+3. Escreva o teste que reproduz o bug, rode e confirme que ele falha pelo motivo esperado (RED do "Ciclo TDD"); a ausência desse teste frequentemente é parte do bug.
 4. Corrija a causa raiz; evite adicionar condição protetora ou contornar o problema sem entender a origem.
-5. Adicione ou atualize o teste que deveria cobrir o caso que falhou.
+5. Rode o teste de novo e confirme que passa.
+
+## Ciclo TDD
+
+Para bug ou regra de negócio nova (validação, cálculo, permissão, transição de estado), trabalhe um comportamento por vez:
+
+1. Pegue o próximo comportamento de "Testes necessários" do plano, na ordem listada. Sem plano, derive a lista da task, do caso principal para as bordas.
+2. RED: escreva um teste só para esse comportamento e rode. Ele deve falhar pelo motivo esperado (assert sobre o comportamento ausente). Falha por import, fixture, setup ou erro de sintaxe não conta: corrija o teste e rode de novo.
+3. GREEN: implemente o mínimo para o teste passar e rode.
+4. REFACTOR: melhore nomes, duplicação e estrutura sem mudar comportamento; rode os testes do arquivo.
+5. Repita até cobrir a lista. Se um ciclo revelar ambiguidade de regra (ex.: `>` ou `>=`), pare e pergunte em vez de escolher.
+
+Fora do ciclo:
+
+- Refatoração sem mudança de comportamento: rode os testes existentes do módulo antes e depois.
+- Migration, settings e configuração: valide com o comando próprio (ex.: `makemigrations --check`).
+- Exploração de alternativa ou biblioteca: protótipo descartável primeiro; o código definitivo volta ao ciclo.
 
 ## Branch e plano da issue
 
@@ -58,6 +74,7 @@ Antes de editar qualquer arquivo:
 Ao terminar a implementação:
 
 - Atualizar a seção "Andamento" do plano com branch, commits, o que foi feito, validações executadas e pendências.
+- Registrar a evidência de cada ciclo TDD em uma linha, sem colar a saída do `pytest`: `<comportamento>: RED <comando> → falhou (<motivo>); GREEN passou`.
 - Ajuste exigido pelo `make ci`/formatador fora do escopo (ex.: arquivo que veio sem formatação da base) vai na mesma branch, em commit próprio, separado do commit da mudança.
 
 ## Planejamento
@@ -144,8 +161,13 @@ Ao terminar a implementação:
 - Use a skill `python-test-refactor` quando a task exigir reorganizar, consolidar ou modernizar testes existentes.
 - Reutilize factories, fixtures e helpers de teste existentes.
 - Se não for viável testar a mudança, explique o motivo e o risco residual.
-- Pergunte ao usuário se deve executar os testes relevantes antes de rodá-los.
-- Se o usuário preferir executar os testes por conta própria, não rode a suíte e informe quais comandos seriam relevantes.
+
+## Execução de testes
+
+- Rode sem perguntar os testes focados: arquivos de teste dos módulos tocados (`pytest <arquivo>` ou `-k <nome>`).
+- Pergunte antes de rodar a suíte completa, `make ci`, lint ou typecheck do projeto inteiro e build.
+- Se o teste focado falhar por infraestrutura (banco, Docker, variável de ambiente), pare e informe; não suba serviços por conta própria.
+- Se o usuário preferir executar os testes por conta própria, não rode e informe quais comandos seriam relevantes.
 
 ## Validação
 
@@ -153,8 +175,8 @@ Antes de entregar:
 1. Revise o diff para remover mudanças acidentais.
 2. Verifique se a implementação segue a nomenclatura e arquitetura locais.
 3. Verifique se não há código morto, duplicado ou temporário.
-4. Confirme que testes foram adicionados ou atualizados quando aplicável.
-5. Pergunte antes de executar testes, lint, typecheck ou build, salvo pedido explícito do usuário.
+4. Confirme que testes foram adicionados ou atualizados quando aplicável e que cada ciclo TDD teve RED e GREEN executados.
+5. Rode os testes focados dos módulos tocados; para validações amplas, siga "Execução de testes".
 6. Não afirme que algo foi testado se o comando não foi executado.
 
 ## Resposta final

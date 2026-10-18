@@ -25,13 +25,13 @@ Criar ou atualizar testes em `tests/unit/`, `tests/integration/` ou `tests/e2e/`
 ## Procedimento
 
 Quando esta skill for usada:
-1. Leia o código de produção, testes existentes e fixtures/factories relacionadas.
+1. Leia o código de produção, testes existentes e fixtures/factories relacionadas. No RED de um ciclo TDD, quando o código ainda não existe, parta do comportamento esperado e da assinatura pretendida (módulo, função ou endpoint) e não invente detalhes internos.
 2. Identifique se o alvo pertence a Django, FastAPI ou código Python agnóstico.
 3. Classifique o teste como `unit`, `integration` ou `e2e`.
 4. Reutilize factories, fixtures e convenções existentes antes de criar novos elementos.
 5. Espelhe o caminho do código de produção no caminho do teste.
 6. Gere testes orientados a comportamento, não a detalhes internos.
-7. Pergunte antes de executar `pytest` ou validações demoradas, salvo pedido explícito do usuário.
+7. Execute testes conforme "Execução".
 
 ## Princípios
 
@@ -155,7 +155,9 @@ Exemplo de espelhamento:
 
 ## Execução
 
-- Pergunte ao usuário antes de rodar `pytest`, lint, typecheck ou validações demoradas.
+- Rode sem perguntar os testes focados: arquivos de teste criados ou alterados (`pytest <arquivo>` ou `-k <nome>`).
+- Pergunte antes de rodar a suíte completa, `make ci`, lint ou typecheck do projeto inteiro e build.
+- Se o teste focado falhar por infraestrutura (banco, Docker, variável de ambiente), pare e informe; não suba serviços por conta própria.
 - Se o usuário preferir executar os testes, informe os comandos relevantes em vez de rodá-los.
 - Não afirme que algo foi testado se o comando não foi executado.
 
@@ -187,4 +189,4 @@ Antes de entregar, confirme:
 5. O teste ficou determinístico e isolado de rede externa, horário real e estado compartilhado?
 6. O comportamento principal, erro/borda relevante e efeitos colaterais foram cobertos quando aplicável?
 7. Foi reutilizada factory/fixture existente ou criada factory nova apenas quando não havia factory para o model específico?
-8. O usuário foi consultado antes de executar testes ou validações demoradas?
+8. Os testes focados foram executados, e o usuário foi consultado antes de validações amplas?
