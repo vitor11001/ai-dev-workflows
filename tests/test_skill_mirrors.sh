@@ -23,6 +23,7 @@ for skill_name in python-implementation-workflow python-tests; do
   fi
 done
 grep -Fq '## Ciclo TDD' "$codex_skills/python-implementation-workflow/SKILL.md"
+grep -Fq '| Comando | Resultado |' "$codex_skills/python-implementation-workflow/SKILL.md"
 grep -Fq 'Ciclos TDD:' "$codex_skills/task-planner/SKILL.md"
 
 # O plano precisa levantar o impacto antes do desenho e revisar a si mesmo antes da entrega.
