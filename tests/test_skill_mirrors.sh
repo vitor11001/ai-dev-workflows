@@ -24,12 +24,36 @@ for skill_name in python-implementation-workflow python-tests; do
 done
 grep -Fq '## Ciclo TDD' "$codex_skills/python-implementation-workflow/SKILL.md"
 grep -Fq '| Comando | Resultado |' "$codex_skills/python-implementation-workflow/SKILL.md"
-grep -Fq 'Ciclos TDD:' "$codex_skills/task-planner/SKILL.md"
+grep -Fq 'Ciclos TDD:' "$codex_skills/implementation-plan/SKILL.md"
 
 # O plano precisa levantar o impacto antes do desenho e revisar a si mesmo antes da entrega.
-for section in '## Mapa de impacto' '## Premissas não verificadas' '## Revisão do plano'; do
-  grep -Fq "$section" "$codex_skills/task-planner/SKILL.md"
+for section in '## Mapa de impacto' '## Premissas não verificadas' '## Revisão do plano' '## Profundidade por tipo'; do
+  grep -Fq "$section" "$codex_skills/implementation-plan/SKILL.md"
 done
+
+# A investigate é dona da pasta da task, do sumário e dos tipos de demanda.
+for section in '## Pasta da task' '## Sumário' '## Tipos' '### Mapa do código atual' '## Issue existente' '## Investigação desatualizada'; do
+  grep -Fq "$section" "$codex_skills/investigate/SKILL.md"
+done
+
+# Toda skill que toca a pasta da task registra a execução no sumário com a data do comando,
+# e nenhuma volta a usar a pasta antiga como destino.
+for skill_name in investigate plane-issue implementation-plan python-implementation-workflow pr-description code-review; do
+  grep -Fq '0-sumario.md' "$codex_skills/$skill_name/SKILL.md"
+  grep -Fq "date '+%Y-%m-%d %H:%M %Z'" "$codex_skills/$skill_name/SKILL.md"
+done
+for skill_name in plane-issue implementation-plan python-implementation-workflow; do
+  grep -Fq 'registre uma linha no `0-sumario.md`' "$codex_skills/$skill_name/SKILL.md"
+done
+if grep -rn 'task-planner\|write-issue\|/tmp/NNN\|2-plano-implementacao.md` para' "$codex_skills" "$claude_skills"; then
+  printf 'referência a skill ou caminho antigo\n' >&2
+  exit 1
+fi
+
+# plane-issue pergunta antes de publicar e publica pelo script, que confere a checklist.
+grep -Fq 'Publico no Plane?' "$codex_skills/plane-issue/SKILL.md"
+grep -Fq 'scripts/plane.py publish' "$codex_skills/plane-issue/SKILL.md"
+[[ -f "$codex_skills/plane-issue/scripts/plane.py" ]]
 
 # python-tests carrega só a referência do framework detectado: os links do SKILL.md precisam
 # existir, e a regra de sinalizar unittest não pode sumir.

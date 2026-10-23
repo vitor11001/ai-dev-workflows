@@ -1,0 +1,4 @@
+interface:
+  display_name: "Investigate"
+  short_description: "Investiga a demanda e registra o estado atual do código"
+  default_prompt: "Use $investigate para investigar esta demanda na codebase e registrar a investigação e o sumário em tmp/tasks/<ID>/."

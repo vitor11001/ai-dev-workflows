@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implementation Plan"
+  short_description: "Planeja a implementação e os PRs em Markdown"
+  default_prompt: "Use $implementation-plan para planejar a implementação desta task em tmp/tasks/<ID>/, a partir da investigação, registrando mapa de impacto, testes, divisão em PRs, decisões e andamento."

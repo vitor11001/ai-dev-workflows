@@ -20,5 +20,6 @@
 - `code-review`: revisa diffs, branches e arquivos alterados com foco em bugs, regressões e riscos.
 - `commit-message`: gera mensagens de commit com base nas alterações atuais.
 - `onboarding`: analisa e resume a estrutura, arquitetura e convenções do projeto.
-- `write-issue`: investiga problemas na codebase e redige issues para Plane.
-- `task-planner`: planeja tasks técnicas, issues, PRs e branches em Markdown.
+- `investigate`: investiga uma demanda (bug, hotfix, feature, melhoria ou débito) e registra o estado atual do código e o sumário da task em `tmp/tasks/<ID>/`.
+- `plane-issue`: redige a issue da task a partir da investigação e publica no Plane quando confirmado.
+- `implementation-plan`: planeja a implementação da task (mapa de impacto, testes, divisão em PRs e andamento).
