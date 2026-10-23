@@ -12,9 +12,10 @@ Descrever o resultado líquido da branch para o revisor, com o menor texto que p
 ## Procedimento
 
 0. **Confirmar a issue antes de qualquer outra coisa.**
-   - Deduzir o identificador pelo nome da branch (`<n>-<identificador>-<descrição>`, ex.: `1-PROJ-123-...` → `PROJ-123`, PR 1) ou pela pasta `tmp/plans/<identificador>/`.
+   - Deduzir o identificador pelo nome da branch (`<n>-<identificador>-<descrição>`, ex.: `1-PROJ-123-...` → `PROJ-123`, PR 1) ou pela pasta `tmp/tasks/<identificador>/`, cujo `0-sumario.md` diz se a task foi publicada no Plane.
    - Perguntar ao usuário, logo no início, se o ID do Plane está correto, mostrando de onde ele veio (ex.: "A branch indica a issue PROJ-123, PR 1. Confirma que é essa no Plane?").
-   - Se não for possível deduzir, ou o identificador for local (`LOCAL-<slug>`), perguntar se a issue existe no Plane e qual é o ID.
+   - Se o sumário disser `Plane: não publicado`, perguntar uma vez se a linha `**Issue:**` deve ser omitida.
+   - Se não for possível deduzir, ou o identificador for local (`LOCAL-<slug>`) sem sumário, perguntar se a issue existe no Plane e qual é o ID.
    - Só seguir depois da confirmação. Se o usuário corrigir o ID, usar o corrigido em todo o texto.
 1. Trabalhar no repositório atual.
 2. Executar `scripts/pr_context.sh`, localizado no diretório desta skill.
@@ -24,13 +25,13 @@ Descrever o resultado líquido da branch para o revisor, com o menor texto que p
    1. **Diff final:** define o comportamento que efetivamente ficou na branch.
    2. **Testes, contratos e migrations:** confirmam comportamento observável, compatibilidade e transições de dados.
    3. **Commits:** explicam motivação, decisões e breaking changes, sem substituir o diff final.
-   4. **Plano da issue:** se existir `tmp/plans/<identificador>/`, ler `2-plano-implementacao.md` para saber o número do PR na divisão, do que ele depende e o que fica para os próximos PRs. O plano dá contexto, mas não substitui o diff: não descrever como feito algo que o diff não mostra.
+   4. **Plano da task:** se existir `tmp/tasks/<identificador>/`, ler `*-plano-implementacao.md` para saber o número do PR na divisão, do que ele depende e o que fica para os próximos PRs. O plano dá contexto, mas não substitui o diff: não descrever como feito algo que o diff não mostra.
    5. **Nome da branch:** serve apenas como pista auxiliar.
 4. Identificar uma mudança principal e agrupar alterações de suporte sob esse resultado. Tratar arquivos gerados, serializers, schemas e testes relacionados como uma única mudança de contrato ou comportamento quando fizerem parte do mesmo efeito.
 5. Escrever o título e a descrição no formato abaixo.
 6. Por padrão, criar ou atualizar o arquivo do corpo:
-   - com pasta de plano: `tmp/plans/<identificador>/<próximo número>-pr-<n>-body.md`, continuando a numeração da pasta (reaproveitar o arquivo do mesmo PR se já existir);
-   - sem pasta de plano: `tmp/pr-body-<branch-name>.md`.
+   - com pasta da task: `tmp/tasks/<identificador>/<próximo número>-pr-<n>-body.md`, continuando a numeração da pasta (reaproveitar o arquivo do mesmo PR se já existir), e registre uma linha no `0-sumario.md` com a data de `date '+%Y-%m-%d %H:%M %Z'` (Status `em review` quando o PR for aberto);
+   - sem pasta da task: `tmp/pr-body-<branch-name>.md`.
    - Se o usuário pedir apenas para visualizar, responder na conversa e não criar arquivo.
 7. Ignorar templates de PR. Não fazer commit nem publicar no GitHub sem pedido explícito.
 
@@ -71,4 +72,4 @@ Antes de entregar, confirmar:
 3. Nenhuma alteração intermediária removida pelo diff final aparece como resultado.
 4. O objetivo principal pode ser entendido sem ler os bullets.
 5. Não há segredos, credenciais, contexto de produto, issue ou teste inventado.
-6. O ID da issue foi confirmado pelo usuário nesta execução.
+6. O ID da issue, ou a omissão da linha `**Issue:**`, foi confirmado pelo usuário nesta execução.

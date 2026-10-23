@@ -21,8 +21,8 @@ necessário não vira achado da branch, mas também não é descartado.
    base no remoto antes (`git fetch`) e ler a defasagem, a simulação de merge e os PRs
    abertos nos mesmos arquivos que o script imprime: gate verde em branch atrasada vale
    para a base antiga, não para o resultado do merge.
-3. Ler a issue que o PR resolve: texto original (`tmp/plans/<ID>/1-issue-original.md`,
-   quando existir), corpo do PR ou issue vinculada. Extrair os critérios de aceite, as
+3. Ler a issue que o PR resolve: texto original (`tmp/tasks/<ID>/*-issue-original.md`,
+   ou `tmp/plans/<ID>/` em pasta antiga, quando existir), corpo do PR ou issue vinculada. Extrair os critérios de aceite, as
    restrições escritas na letra ("passar pelo caminho X", "não montar o texto à mão") e os
    exemplos concretos de valor ruim. Conferir cada um contra o diff final; exemplo citado
    pela issue vira entrada das sondas e testes.
@@ -72,8 +72,10 @@ necessário não vira achado da branch, mas também não é descartado.
     Em PR cujo objetivo declarado é reorganizar código (extrair, dividir, mover,
     agrupar), nome e coesão das unidades criadas são a entrega, não cosmética: seguir
     "Reorganização de código" em [references/review-surfaces.md](references/review-surfaces.md).
-16. Criar `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada, reproduzindo a
-    revisão entregue ao usuário.
+16. Gravar a revisão entregue ao usuário. Com pasta da task, em
+    `tmp/tasks/<ID>/<próximo número>-code-review-pr-<n>.md`, e registre uma linha no
+    `0-sumario.md` com a data de `date '+%Y-%m-%d %H:%M %Z'`; sem pasta, em
+    `tmp/YYYYMMDD-HHMMSS-code-review-<slug>.md` na raiz revisada.
 
 ## Escopo e referências da revisão
 
