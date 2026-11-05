@@ -25,10 +25,11 @@ Cardápio de cenários para escolher o que cobrir (modo criar) ou o que preserva
 - Fluxo feliz: retorna o resultado esperado.
 - Validação de entrada: rejeita valores inválidos.
 - Orquestração observável: integra repositórios, gateways ou services no nível certo sem testar detalhe irrelevante.
-- Transações: commit, rollback ou atomicidade quando aplicável.
+- Transações: commit, rollback ou atomicidade quando aplicável; o rollback é provado pelo efeito gravado antes da falha e desfeito depois.
 - Efeitos colaterais: eventos, jobs, logs relevantes, cache ou notificações.
 - Erros recuperáveis: fallback, retry ou tradução de erro quando existir.
 - Erros de domínio: propaga ou converte exceção conforme contrato.
+- Recusas sem efeito: nada persistido, enviado, auditado ou publicado quando a operação é recusada.
 - Não duplicidade: não cria registros duplicados em chamadas repetidas quando isso for regra.
 - Permissões e regras de acesso quando o controller aplicar regra antes de chamar domínio.
 
@@ -46,6 +47,7 @@ Cardápio de cenários para escolher o que cobrir (modo criar) ou o que preserva
 - Persistência de campos calculados: totals, slugs, campos normalizados e timestamps.
 - Soft delete e flags de ativo/inativo.
 - Ordenação ou `Meta` quando impactar comportamento.
-- Signals e hooks apenas quando forem comportamento real e observável.
+- Signals e hooks apenas quando forem comportamento real e observável, disparados pelo caminho real.
 - Representação textual como `__str__` quando usada por admin, logs ou UI.
-- Regras de data e timezone quando houver vencimento, expiração ou janela temporal.
+- Regras de data e timezone quando houver vencimento, expiração ou janela temporal, com relógio fixo e a borda exata.
+- Concorrência quando houver trava, unicidade disputada ou emissão que anula a anterior: duas transações reais, sincronizadas por eventos com timeout.

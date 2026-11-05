@@ -70,6 +70,7 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 
+# conftest.py
 @pytest.fixture
 async def client(session: AsyncSession) -> AsyncIterator[AsyncClient]:
     """Cliente HTTP da aplicação usando a sessão isolada do teste."""
@@ -79,6 +80,7 @@ async def client(session: AsyncSession) -> AsyncIterator[AsyncClient]:
     app.dependency_overrides.clear()
 
 
+# test_orders_route.py
 async def test_should_create_order(client: AsyncClient, session: AsyncSession):
     """Deve criar o pedido e retornar 201 com o id gerado."""
     # When
@@ -94,7 +96,7 @@ async def test_should_create_order(client: AsyncClient, session: AsyncSession):
 ## Autenticação e configuração
 
 - Autenticação: sobrescreva a dependência que resolve o usuário (`app.dependency_overrides[get_current_user] = lambda: user`). Teste o fluxo real de token apenas nos testes do próprio mecanismo de autenticação.
-- Configuração: sobrescreva a dependência `get_settings` com um `Settings` de teste. Se `get_settings` usa `lru_cache`, chame `get_settings.cache_clear()` no teardown.
+- Configuração: sobrescreva a dependência `get_settings` com um `Settings` de teste. Se `get_settings` usa `lru_cache`, chame `get_settings.cache_clear()` no teardown da fixture (isolamento entre testes). Quando o cache é a própria regra sob teste, não o limpe no teste: prepare o cenário por dados.
 - Gateways e clients de terceiros: sobrescreva a dependência que os fornece com um fake; nunca chame o serviço real.
 
 ## Contrato HTTP
