@@ -109,6 +109,10 @@ done
 install_project_instructions_copy
 ensure_user_instructions_include
 
+if [[ "$TARGET" == "claude" ]]; then
+  "$REPO_DIR/scripts/merge-claude-permissions.sh"
+fi
+
 echo "Skills instaladas em:"
 echo "$TARGET_DIR"
 echo

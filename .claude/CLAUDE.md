@@ -23,3 +23,4 @@
 - `investigate`: investiga uma demanda (bug, hotfix, feature, melhoria ou débito) e registra o estado atual do código e o sumário da task em `tmp/tasks/<ID>/`.
 - `plane-issue`: redige a issue da task a partir da investigação e publica no Plane quando confirmado.
 - `implementation-plan`: planeja a implementação da task (mapa de impacto, testes, divisão em PRs e andamento).
+- `codex-delegate`: delega trabalho pesado ao Codex CLI (`codex exec`) e revisa o resultado, para economizar tokens do Claude. Exclusiva do Claude.

@@ -142,6 +142,10 @@ remove_stale_skill_links
 ensure_symlink "$PROJECT_INSTRUCTIONS_SOURCE" "$PROJECT_INSTRUCTIONS_TARGET" "$INSTRUCTIONS_FILENAME"
 ensure_user_instructions_include
 
+if [[ "$TARGET" == "claude" ]]; then
+  "$REPO_DIR/scripts/merge-claude-permissions.sh"
+fi
+
 log "Skills instaladas como symlinks em:"
 log "$TARGET_DIR"
 log
