@@ -58,13 +58,21 @@ grep -Fq 'scripts/plane.py publish' "$codex_skills/plane-issue/SKILL.md"
 # python-tests carrega só a referência do framework detectado: os links do SKILL.md precisam
 # existir, e a regra de sinalizar unittest não pode sumir.
 python_tests="$codex_skills/python-tests"
-for reference_name in django-drf.md fastapi-sqlmodel.md scenarios-by-target.md; do
+for reference_name in django-drf.md fastapi-sqlmodel.md scenarios-by-target.md legacy-suite-redesign.md test-matrix-template.md; do
   [[ -f "$python_tests/references/$reference_name" ]]
   grep -Fq "references/$reference_name" "$python_tests/SKILL.md"
 done
 grep -Fq '### unittest' "$python_tests/SKILL.md"
 grep -Fq '## Resposta final' "$python_tests/SKILL.md"
 grep -Fq '| Arquivo de teste | Camada | Comportamento | Resultado |' "$python_tests/SKILL.md"
+# Regras do redesenho da suíte: modalidade pela fronteira, fixtures só no conftest e defeito de
+# produção achado em etapa de testes tratado sem correção não autorizada nem skip/xfail.
+for section in '### Modalidade' '### Asserções que medem a regra' '### Redesenho de suíte legada' '### Defeito de produção encontrado em etapa de testes'; do
+  grep -Fq "$section" "$python_tests/SKILL.md"
+done
+grep -Fq 'Começar pela API não torna o teste E2E' "$python_tests/SKILL.md"
+grep -Fq 'Toda `@pytest.fixture` fica no `conftest.py`' "$python_tests/SKILL.md"
+grep -Fq '## Destino dos cenários legados' "$python_tests/references/test-matrix-template.md"
 
 # O repositório é público: exemplos usam identificadores fictícios (`PROJ-123`), nunca IDs
 # de issues reais do Plane.

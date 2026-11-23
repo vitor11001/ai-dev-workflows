@@ -16,13 +16,17 @@ Padrões para testes com `pytest-django` e Django REST Framework. O padrão já 
 - Monte URLs com `django.urls.reverse` pelo nome da rota, não com caminho literal.
 - Envie JSON com `format="json"` (ou `content_type="application/json"`) quando o endpoint esperar JSON.
 
+- Autenticação forçada é atalho de integração. Quando a autenticação ou a sessão faz parte do contrato (JWT, middleware que reaproveita o usuário, trava por domínio), use o token real e confira se o ambiente de teste não desliga o caminho de produção (`DEBUG` ligado, host ausente, classe de autenticação diferente).
+
 ```python
+# conftest.py
 @pytest.fixture
 def api_client() -> APIClient:
     """Cliente DRF sem autenticação."""
     return APIClient()
 
 
+# test_orders_view.py
 def test_should_return_only_own_orders(db, api_client):
     """Deve listar apenas os pedidos do usuário autenticado."""
     # Given
@@ -87,7 +91,9 @@ def test_should_list_orders_without_n_plus_one(db, api_client, django_assert_num
 ## Efeitos colaterais
 
 - `transaction.on_commit`: use a fixture `django_capture_on_commit_callbacks(execute=True)` em vez de `transactional_db`.
-- Signals: teste apenas quando forem comportamento real e observável; verifique o efeito, não a chamada do receiver.
+- Signals: teste apenas quando forem comportamento real e observável; dispare pelo `save`/`delete`/endpoint real e verifique o efeito, não a chamada do receiver nem um `send` mockado.
+- Rollback com `transaction.atomic`: provoque a falha depois de um efeito já gravado (fake nomeada que falha na escrita seguinte) e confira que o efeito some; o status 500 não basta.
+- Concorrência (`select_for_update`, disputa entre transações): `transactional_db`, uma conexão por thread (`connection.close()` no `finally` da thread), `threading.Event` com timeout e, se preciso, `pg_stat_activity` para saber que a outra transação está esperando a trava. Sem `sleep`.
 - E-mail: fixture `mailoutbox`.
 - Celery: isole o `.delay`/`.apply_async` com `monkeypatch` e verifique os argumentos, ou siga a configuração eager do projeto; não dependa de broker real.
 - Configuração: fixture `settings` (`settings.FEATURE_X = True`), desfeita automaticamente ao fim do teste.
