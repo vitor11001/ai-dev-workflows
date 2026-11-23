@@ -1,0 +1,30 @@
+# Python (gerado ao rodar os scripts das skills e os testes)
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# Artefatos locais das skills: relatórios, PR bodies e pastas de task
+tmp/
+pr_body.md
+
+# Configuração local de agentes (não compartilhar)
+.claude/settings.local.json
+.codex/config.toml
+
+# Segredos
+.env
+*.env
+*.pem
+*.key
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Backups gerados pelos instaladores
+*.bak.*

@@ -6,9 +6,11 @@ codex_skills="$repo_dir/.codex/skills"
 claude_skills="$repo_dir/.claude/skills"
 
 # As skills são mantidas duplicadas em .codex/ e .claude/. Compara as duas árvores inteiras,
-# exceto `agents/`, que guarda metadados exclusivos do Codex (`openai.yaml`). Uma skill ou
-# arquivo presente de um lado só também é falha.
-if ! diff -r --exclude=agents "$codex_skills" "$claude_skills"; then
+# exceto `agents/`, que guarda metadados exclusivos do Codex (`openai.yaml`), e as skills
+# exclusivas do Claude (`codex-delegate` orquestra o Codex; não faz sentido do lado dele) e o
+# `__pycache__` que o Python gera ao rodar os scripts das skills.
+# Uma skill ou arquivo presente de um lado só também é falha.
+if ! diff -r --exclude=agents --exclude=codex-delegate --exclude=__pycache__ "$codex_skills" "$claude_skills"; then
   printf 'skills divergentes entre .codex/skills e .claude/skills\n' >&2
   exit 1
 fi

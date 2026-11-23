@@ -26,6 +26,8 @@ O repositório mantém dois conjuntos paralelos de skills com o mesmo conteúdo,
 
 - `.claude/CLAUDE.md`: instruções globais para uso do Claude Code neste repositório.
 - `.claude/skills/*`: mesmas skills da pasta `.codex/`, adaptadas para o Claude Code (mesma estrutura `SKILL.md` com frontmatter).
+- `.claude/skills/codex-delegate`: exclusiva do Claude. Delega trabalho pesado ao Codex CLI (`codex exec`) em background e revisa o resultado, para economizar tokens do Claude.
+- `.claude/permissions.json`: regras de `permissions.allow` que as skills precisam (ex.: `Bash(codex exec:*)`), aplicadas no `~/.claude/settings.json` pelo instalador.
 
 ## Instalação
 
@@ -65,7 +67,8 @@ Durante a instalação (em ambos os modos e para ambas as ferramentas):
 - scripts `.sh` dentro das skills instaladas recebem permissão de execução automaticamente;
 - o arquivo de instruções (`AGENTS.md` para Codex, `CLAUDE.md` para Claude) é instalado em `~/.<codex|claude>/ai-dev-workflows/`;
 - o instalador preserva o conteúdo existente em `~/.<codex|claude>/<AGENTS|CLAUDE>.md` e adiciona apenas uma diretiva `@.../ai-dev-workflows/<AGENTS|CLAUDE>.md` quando ela ainda não existir;
-- se o arquivo de usuário já existir e precisar ser alterado, um backup `*.bak.<timestamp>` é criado antes.
+- se o arquivo de usuário já existir e precisar ser alterado, um backup `*.bak.<timestamp>` é criado antes;
+- no Claude, as regras de `.claude/permissions.json` são acrescentadas ao `permissions.allow` de `~/.claude/settings.json` (`scripts/merge-claude-permissions.sh`). O merge só adiciona: outras chaves e regras do usuário são preservadas, há backup `settings.json.bak.<timestamp>` antes de alterar, e regras retiradas do repositório precisam ser removidas à mão.
 
 No modo **symlink**, as skills e o arquivo de instruções do projeto apontam para os arquivos deste repositório. Depois da primeira instalação, um `git pull` no repositório já atualiza o conteúdo usado pela ferramenta.
 
@@ -77,7 +80,7 @@ O modo symlink também remove links que apontam para uma skill deste repositóri
 | `post-checkout` | na troca de branch (não no checkout de arquivo) |
 | `post-rewrite` | depois de `git rebase` ou `git pull --rebase` |
 
-Assim, uma skill nova ganha link, uma skill removida perde o link, e as skills acompanham a branch atual. Os hooks só agem na ferramenta já instalada por symlink; instalação por cópia não é alterada. Só são impressas mudanças efetivas (`[claude] link criado: ...`).
+Assim, uma skill nova ganha link, uma skill removida perde o link, uma permissão nova de `.claude/permissions.json` entra no `settings.json`, e as skills acompanham a branch atual. Os hooks só agem na ferramenta já instalada por symlink; instalação por cópia não é alterada. Só são impressas mudanças efetivas (`[claude] link criado: ...`).
 
 ## Uso
 
